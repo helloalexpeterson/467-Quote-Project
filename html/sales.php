@@ -11,21 +11,8 @@
     <style type="text/css">.body { width: auto; }</style>
 
     <?php
-    //Connect to mariadb function
-    $servername = "blitz.cs.niu.edu";
-    $username = "student";
-    $password = "student";
-    $dbname = "csci467";
-    // Create connection
-    try {
-      $dsn = "mysql:dbname=$dbname;host=$servername";
-      $pdo = new PDO($dsn, $username, $password);
-      $pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
-    } 
-    catch(PDOException $error){  
-        die('    <p> Connection to database failed: ' . $error->getMessage() . "</p>\n </body></html>"); 
-    }
-    
+    include '../lib/db.php';
+    $pdo = connectlegacy();
     $sql = "SELECT id, name FROM customers";
     
     $result = $pdo->query($sql);
