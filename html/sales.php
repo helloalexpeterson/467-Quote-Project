@@ -35,25 +35,23 @@
   </head>
   <body>
     
-    <form action=" ">
+    <form action="newquote.php">
     <label for="fname">Select customer:</label><br>
 
-    <form action=" ">
+    <form action="newquote.php" method="POST">
       <label for="customer"></label>
       <select>
         <option selected="selected">Choose one</option>
         <?php
-        // A sample product array
-        //$products = array();
-        
-        // Iterating through the product array
+      
+        // Iterating through the array of customers
         foreach($row as $customer => $index){
-          echo "<option value={$index['name']}>{$index['name']}</option>";
+          echo "<option value={$index['id']}>{$index['name']}</option>";
       }
         
         ?>
     </select>
-    <input type="submit" value="Submit">
+    <input type="submit" value="Create New Quote"> <p>This will direct to a new page</p>
 
   </body>
 </html>
