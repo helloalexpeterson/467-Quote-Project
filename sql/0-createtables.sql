@@ -5,9 +5,9 @@ DROP TABLE IF EXISTS PurchaseOrders, LineItems, Notes, Quotes, Employees;
 CREATE TABLE Employees (
     EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
     Email VARCHAR(32) NOT NULL,
-    Name VARCHAR(32) NOT NULL,
+    EmpName VARCHAR(32) NOT NULL,
     Title ENUM('Sales Associate', 'Headquarters', 'Administrator'),
-    Password VARCHAR(32) NOT NULL,
+    PwHash VARCHAR(32) NOT NULL,
     CommissionTotal DOUBLE(8,2) DEFAULT 0.00
 );
 
