@@ -10,25 +10,22 @@
     <link rel="stylesheet" href="./stylesheet.css" type="text/css" />
     <style type="text/css">.body { width: auto; }</style>
 
-    <?php
+  <?php
     include '../lib/db.php';
     $pdo = connectlegacy();
     $sql = "SELECT id, name FROM customers";
     
     $result = $pdo->query($sql);
     $row = $result->fetchAll(PDO::FETCH_ASSOC);
-    ?>
+  ?>
 
   </head>
   <body>
     
-    <form action="newquote.php">
-    <label for="fname">Select customer:</label><br>
-
     <form action="newquote.php" method="POST">
-      <label for="customer"></label>
-      <select>
-        <option selected="selected">Choose one</option>
+    <label for="id">Select customer:</label><br>
+      <select id="id" name="id">
+        <option value="selected">Choose one</option>
         <?php
       
         // Iterating through the array of customers
