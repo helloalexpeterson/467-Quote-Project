@@ -23,6 +23,7 @@
    //debug print
    echo "ignore this - debug info";
    echo "<pre>";  print_r($_POST);  echo "<br>";  echo "</pre>";
+   echo "<pre>";  print_r($_GET);  echo "<br>";  echo "</pre>";
    echo "<pre>";  print_r($row);    echo "</pre>";
 
    //Print header
@@ -37,21 +38,30 @@
    }
 ?>
 <br>
-<form>  
-    <label for ="email">Email:</label>  
-    <input type="text" id="email" name="email"><br>
-</form>
+
 
 <p> Quote line items: </p><br>
 <br>
 <p>Secret notes: </p><br>
 <br>
 
-<form>  
+
+<form action="newquote.php" method="POST">  
+    <label for ="email">Email:</label>  
+    <input type="text" id="email" name="email"><br>
     <label for ="discount">Discount: </label>  
     <input type="text" id="discount" name="discount"><br> 
     <input type="radio" id="percent" name="discounttype" value="percent">
         <label for="percent">Percent off order</label><br>
     <input type="radio" id="amount" name="discounttype" value="amount">
         <label for="amount">Amount off order</label><br>
+        
+<input type="text" name="item[]" /><input type="number" name="qty[]" /><br />
+<input type="text" name="item[]" /><input type="number" name="qty[]" /><br />
+<input type="text" name="item[]" /><input type="number" name="qty[]" /><br />
+
+<input type="hidden" name="id" value=<?php echo $_POST['id']; ?>>
+
+<input type="submit" value="SUBMIT"> 
 </form>
+
