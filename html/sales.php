@@ -21,8 +21,7 @@
 
   </head>
   <body>
-
-
+  
   <?php 
   if($view=="associate") 
   { 
@@ -30,15 +29,19 @@
     echo "<label for='id'>Select customer:</label><br>";
     echo "<select id='id' name='id'>";
       echo "<option value='selected'>Choose one</option>";
+
         // Iterating through the array of customers
         foreach($row as $customer => $index){
           echo "<option value={$index['id']}>{$index['name']}</option>";
       }
+
     echo "</select>";  
      
     echo "<input type='submit' value='Create New Quote'> <p>This will direct to a new page</p>";
   }
   
+  ?>
+
 
 if($view=="admin") 
   { 
