@@ -12,6 +12,19 @@
     
   <?php
     include '../lib/db.php';
+     //debug print
+   echo "ignore this - debug info"; 
+
+   echo "<br>";
+   echo "<pre>  'POST'";  
+   print_r($_POST);   
+   echo "</pre>" ;
+
+   echo "<pre> 'GET'";  
+   print_r($_GET);  
+   echo "<br>";  
+   echo "</pre> <br>";
+
     $pdo = connectlegacy();
     $sql = "SELECT id, name FROM customers";
     
@@ -57,6 +70,7 @@ if($view=="admin")
     $dresult = $db->query($dbsql);
     $dbrow = $dresult->fetchAll(PDO::FETCH_ASSOC);
 
+    echo "<pre>"; echo "rows queried"; echo "<br>"; print_r($dbrow);    echo "</pre>";
    
      echo "<table border='1'>
      <tr>
@@ -64,9 +78,17 @@ if($view=="admin")
      <th>Name</th>
      <th>Order Total</th>
      </tr>";
-     echo "<td> {$dbrow[0]["CustomerID"] } </td>" ; 
-     echo "<td> {$dbrow[0]["CustomerName"] } </td>" ; 
-     echo "<td> {$dbrow[0]["OrderTotal"] } </td>" ; 
+     foreach($dbrow as $row){
+     echo "<td> {$row['CustomerID'] } </td>" ; 
+     echo "<td> {$row['CustomerName'] } </td>" ; 
+     echo "<td> {$row['OrderTotal'] } </td>" ; 
+    }
+
+    foreach($dbrow as $k => $v){
+      echo "<td> {$row['CustomerID'] } </td>" ; 
+      echo "<td> {$row['CustomerName'] } </td>" ; 
+      echo "<td> {$row['OrderTotal'] } </td>" ; 
+     }
 
     
     ?>
