@@ -37,5 +37,13 @@
     <h3> List of open quotes: </h3>  
     
 
+    <h3>List of open quotes:</h3>
+    <?php 
+    $db = connectdb();
+    $dbsql = "SELECT CustomerID,   , name FROM customers";
+    $dbresult = 
+
+    
+    ?>
   </body>
 </html>
