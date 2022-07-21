@@ -21,21 +21,21 @@
 
   </head>
   <body>
-    
     <form action="newquote.php" method="POST">
     <label for="id">Select customer:</label><br>
       <select id="id" name="id">
-        <option value="selected">Choose one</option>
-        <?php
-      
+       <option value="selected">Choose one</option>
+
+  <?php
         // Iterating through the array of customers
         foreach($row as $customer => $index){
           echo "<option value={$index['id']}>{$index['name']}</option>";
       }
-        
-        ?>
+  ?>
     </select>
     <input type="submit" value="Create New Quote"> <p>This will direct to a new page</p>
+    <h3> List of open quotes: </h3>  
+    
 
   </body>
 </html>
