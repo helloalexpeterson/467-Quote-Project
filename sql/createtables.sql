@@ -22,6 +22,8 @@ CREATE TABLE Quotes (
     EmployeeID INT NOT NULL,
     OrderStatus ENUM('open', 'finalized', 'sanctioned', 'ordered'),
     CommissionRate INT(2),
+    OrderTotal DECIMAL(10, 2) NOT NULL,
+
 
     FOREIGN KEY(EmployeeID) REFERENCES Employees
 );
@@ -51,7 +53,7 @@ CREATE TABLE PurchaseOrders(
     CustomerID INT,
     OrderTotal DECIMAL(10, 2) NOT NULL,
     CustomerName VARCHAR(32),
-    ProcessDate DATE NOT NULL,
+    ProcessDate DATE NOT NULL DEFAULT CURRENT_DATE(),
     CommissionTotal DECIMAL(8,2) NOT NULL,
     OrderTime TIMESTAMP NOT NULL,
 

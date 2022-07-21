@@ -37,5 +37,13 @@
     </select>
     <input type="submit" value="Create New Quote"> <p>This will direct to a new page</p>
 
+    <h3>List of open quotes:</h3>
+    <?php 
+    $db = connectdb();
+    $dbsql = "SELECT CustomerID,   , name FROM customers";
+    $dbresult = 
+
+    
+    ?>
   </body>
 </html>
