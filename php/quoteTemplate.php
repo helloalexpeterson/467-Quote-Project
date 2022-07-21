@@ -16,25 +16,37 @@ try {
     //THERE IS NO MEMORY
     //DISCUSS HOW TO WORK AROUND
     //POSSIBLE TEMP DB???????
+
+    // POST values
+    // THESE WILL CHANGE THE RENDERING AND AVAILABLE FUNCTIONS
     $action = isset($_POST['action']) ? $_POST['action'] : '';
     $subAction = isset($_POST['subAction']) ? $_POST['subAction'] : '';
     $new = isset($_POST['new']) ? $_POST['new'] : '';
+
+    // Legacy DB values
     $email = "From DB Table";
     $CustomerName = isset($_POST['CustomerName']) ? $_POST['CustomerName'] : "Query DB for customer name";
     $city = "City from Legacy";
     $street = "Street from Legacy";
     $contact = "Contacy from Legacy";
-    echo "<h2>SAVE \$action TO php session IF POSSIBLE, ELSE NEED TO DISCUSS</h2>";
-    echo "The page's action is set to ";
-    echo "$action";
-    echo "<br>The page's subAction is set to ";
-    echo "$subAction";
+    
+    //Name and Address
+    echo <<< html
+        // DEBUG
+        <h2>SAVE \$action TO php session IF POSSIBLE, ELSE NEED TO DISCUSS</h2>
+        The page's action is set to 
+        $action
+        <br>The page's subAction is set to 
+        $subAction
+        // DEBUG
     
     
-    echo "<h2>$CustomerName</h2>";
+        <h2>$CustomerName</h2>
 
-    echo "<div id=\"address\">$city<br>$street<br>$contact<br></div>";
+        <div id=\"address\">$city<br>$street<br>$contact<br></div>
+    html;
 
+    // Email
     echo "<form id=\"email\" action=\"\" method=\"POST\">";
         echo "<input type=\"hidden\" name=\"subAction\" value=\"email\">";
         echo "Email: ";
@@ -45,40 +57,49 @@ try {
             echo "><button type=\"submit\">Save email</button>";
     echo "</form>";
 
+    // Line Items
     echo "<h1>Line Items:</h1>";
     echo "query quote table";
     if ($action != "process") {
-        echo " EDITING/SAVE DELETING BUTTONS";
-        echo "<form action=\"\" method=\"POST\">";
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"addLine\">";
-            echo "<input type=\"text\" name=\"ServiceDesc\" placeholder=\"Service Description\">";
-            echo "<input type=\"text\" name=\"Cost\" placeholder=\"Service Cost\">";
-            echo "<button type=\"submit\">Add Line Item</button>";
-        echo "</form>";
+        echo <<< html
+            EDITING/SAVE DELETING BUTTONS
+            <form action="" method="POST">
+                <input type="hidden" name="subAction" value="addLine">
+                <input type="text" name="ServiceDesc" placeholder="Service Description">
+                <input type="text" name="Cost" placeholder="Service Cost">
+                <button type="submit">Add Line Item</button>
+            </form>
+        html;
     }
 
+    // Secret Notes
     echo "<h1>Secret Notes:</h1>";
     echo "query quote table";
     if ($action != "process") {
-        echo " EDITING/SAVE DELETING BUTTONS";
-        echo "<form action=\"\" method=\"POST\">";
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"addNote\">";
-            echo "<input type=\"text\" name=\"Note\" placeholder=\"Note\">";
-            echo "<button type=\"submit\">Add Secret Note</button>";
-        echo "</form>";
+        echo <<< html
+            EDITING/SAVE DELETING BUTTONS
+            <form action="" method="POST">
+                <input type="hidden" name="subAction" value="addNote">
+                <input type="text" name="Note" placeholder="Note">
+                <button type="submit">Add Secret Note</button>
+            </form>
+        html;
     }
 
+    // Discount
+    echo <<< html
+        <form id="discount" action="" method="POST">
+            <input type="hidden" name="subAction" value="discount">
+            Discount: 
+            <input type="text" name="discount" placeholder="%">
+            <button type="submit">Apply</button>
+            <input type="radio" name="type" value="percent">percent
+            <input type="radio" name="type" value="amount">amount
+            <br>Amount: \$query table line item
+        </form>
+    html;
 
-    echo "<form id=\"discount\" action=\"\" method=\"POST\">";
-        echo "<input type=\"hidden\" name=\"subAction\" value=\"discount\">";
-        echo "Discount: ";
-        echo "<input type=\"text\" name=\"discount\" placeholder=\"%\">";
-        echo "<button type=\"submit\">Apply</button>";
-        echo "<input type=\"radio\" name=\"type\" value=\"percent\">percent";
-        echo "<input type=\"radio\" name=\"type\" value=\"amount\">amount";
-        echo "<br>Amount: \$query table line item";
-    echo "</form>";
-
+    // Create/Update Button
     echo "<form id=\"update\" action=\"\" method=\"POST\">";
     echo "<input type=\"hidden\" name=\"subAction\" value=\"update\">";
         if($new)
@@ -87,7 +108,7 @@ try {
             echo "<button type=\"submit\">Update</button>";
     echo "</form>";
 
-
+    // View completion button
     echo "<form action=\"\" method=\"POST\">";
         if($action == "create") {
             echo "To finalize this quote and submit it to processing in headquarters, click here: ";
