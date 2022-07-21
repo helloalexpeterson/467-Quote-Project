@@ -42,7 +42,7 @@
   
   ?>
 
-
+<?php 
 if($view=="admin") 
   { 
    echo "This would be the master quote lookup";
