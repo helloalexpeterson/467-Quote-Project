@@ -22,8 +22,7 @@ CREATE TABLE Quotes (
     EmployeeID INT NOT NULL,
     OrderStatus ENUM('open', 'finalized', 'sanctioned', 'ordered'),
     CommissionRate INT(2),
-    OrderTotal DECIMAL(10, 2) NOT NULL,
-
+    OrderTotal DECIMAL(10, 2) DEFAULT 0.00,
 
     FOREIGN KEY(EmployeeID) REFERENCES Employees
 );
