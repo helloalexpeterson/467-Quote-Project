@@ -14,17 +14,18 @@ try {
     $pdo = connectdb();
     $legacy = connectlegacy();
    
-    $customerID = isset($_POST['customerID']) ? $_POST['customerID'] : '';
-    if ($customerID) {
-        $result = $legacy->query("SELECT * FROM customers where id = $customerID");
-        $cust = $result->fetchAll(PDO::FETCH_ASSOC);  
-    }
     // GET QUOTE ID FROM FORM
     $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID'] : '';
     if ($quoteID) {
         $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
         // $result = $pdo->query("SELECT * FROM Quotes where QuoteID = 1");
         $quote = $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    // $customerID = $quote[0]["CustomerID"];
+    $customerID = isset($_POST['customerID']) ? $_POST['customerID'] : $quote[0]["CustomerID"];
+    if ($customerID) {
+        $result = $legacy->query("SELECT * FROM customers where id = $customerID");
+        $cust = $result->fetchAll(PDO::FETCH_ASSOC);  
     }
 
     //IMPORTANT
@@ -38,7 +39,7 @@ try {
     // POST values
     // THESE WILL CHANGE THE RENDERING AND AVAILABLE FUNCTIONS
     $action = isset($_POST['action']) ? $_POST['action'] : '';
-    $subAction = isset($_POST['subAction']) ? $_POST['subAction'] : '';
+    $formAction = isset($_POST['formAction']) ? $_POST['formAction'] : '';
     $new = isset($_POST['new']) ? $_POST['new'] : '';
 
     // Legacy DB values
@@ -48,14 +49,26 @@ try {
     $street = isset($cust[0]['street']) ? $cust[0]['street'] : "No street found";
     $contact = isset($cust[0]['contact']) ? $cust[0]['contact'] : "No contact found";
     
+
+    //FORM FUNCTIONS
+
+    if ($formAction == "email") {
+        $email = isset($_POST['newEmail']) ? $_POST['newEmail'] : "No new email given";
+        $prepared = $pdo->prepare("UPDATE Quotes SET Email=? WHERE QuoteID = $quoteID");
+        $prepared->execute([$email]);
+    }
+
+    //END OF FORM FUNC
+
+
     //Name and Address
     echo <<< html
         // DEBUG
         <h2>SAVE \$action TO php session IF POSSIBLE, ELSE NEED TO DISCUSS</h2>
         The page's action is set to 
         $action
-        <br>The page's subAction is set to 
-        $subAction
+        <br>The page's formAction is set to 
+        $formAction
         // DEBUG
     
     
@@ -66,12 +79,13 @@ try {
 
     // Email
     echo "<form id=\"email\" action=\"\" method=\"POST\">";
-        echo "<input type=\"hidden\" name=\"subAction\" value=\"email\">";
+        echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
+        echo "<input type=\"hidden\" name=\"formAction\" value=\"email\">";
         echo "Email: ";
-        echo "<input type=\"text\" name=\"email\" value=\"$email\"";
-        if ($action != "create") 
-            echo "disabled=\"disabled\">";
-        else
+        echo "<input type=\"text\" name=\"newEmail\" value=\"$email\"";
+        // if ($action != "create") 
+        //     echo "disabled=\"disabled\">";
+        // else
             echo "><button type=\"submit\">Save email</button>";
     echo "</form>";
 
@@ -96,7 +110,7 @@ try {
         echo <<< html
             EDITING/SAVE DELETING BUTTONS
             <form action="" method="POST">
-                <input type="hidden" name="subAction" value="addLine">
+                <input type="hidden" name="formAction" value="addLine">
                 <input type="text" name="ServiceDesc" placeholder="Service Description">
                 <input type="text" name="Cost" placeholder="Service Cost">
                 <button type="submit">Add Line Item</button>
@@ -111,7 +125,7 @@ try {
         echo <<< html
             EDITING/SAVE DELETING BUTTONS
             <form action="" method="POST">
-                <input type="hidden" name="subAction" value="addNote">
+                <input type="hidden" name="formAction" value="addNote">
                 <input type="text" name="Note" placeholder="Note">
                 <button type="submit">Add Secret Note</button>
             </form>
@@ -132,7 +146,7 @@ try {
     // Discount
     echo <<< html
         <form id="discount" action="" method="POST">
-            <input type="hidden" name="subAction" value="discount">
+            <input type="hidden" name="formAction" value="discount">
             Discount: 
             <input type="text" name="discount" placeholder="%">
             <button type="submit">Apply</button>
@@ -144,7 +158,7 @@ try {
 
     // Create/Update Button
     echo "<form id=\"update\" action=\"\" method=\"POST\">";
-    echo "<input type=\"hidden\" name=\"subAction\" value=\"update\">";
+    echo "<input type=\"hidden\" name=\"formAction\" value=\"update\">";
         if($new)
             echo "<button type=\"submit\">Create</button>";
         else
@@ -162,7 +176,7 @@ try {
             //
             //
             //
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"foo\">";
+            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
             echo "<button type=\"submit\">Finalize Quote [TEMP: action=sanction][REQUIRE EMAIL]</button>";
         }
         else if($action == "sanction") {
@@ -174,7 +188,7 @@ try {
             //
             //
             //
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"foo\">";
+            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
             echo "<button type=\"submit\">Sanction Quote [TEMP: action=process]</button>";
         }
         else if($action == "process") {
@@ -186,7 +200,7 @@ try {
             //
             //
             //
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"foo\">";
+            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
             echo "<button type=\"submit\">Process PO [TEMP: action=done]</button>";
         }
         else {
@@ -199,7 +213,7 @@ try {
             //
             //
             //
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"foo\">";
+            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
             echo "<button type=\"submit\">Unknown Action [TEMP: action=create]</button>";
         }
     echo "</form>";

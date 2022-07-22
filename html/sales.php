@@ -40,7 +40,7 @@
   { 
     echo"<form action='../php/quoteTemplate.php' method='POST'>";
     echo "<label for='id'>Select customer:</label><br>";
-    echo "<select id='id' name='customerID'>";
+    echo "<select id='id' name='newCustomerID'>";
       echo "<option value='selected'>Choose one</option>";
 
         // Iterating through the array of customers
@@ -78,13 +78,13 @@ if($view=="admin")
      echo "<th>" . "ID" . "</th><th>" . "Name" . "</th><th>" . "Order Total" . "</th><th></th>\n";
      foreach($orders as $row) {
          $quoteID = $row["QuoteID"];
-         $customerID = $row["CustomerID"];
+        //  $customerID = $row["CustomerID"];
 
          echo "<tr>";
          echo "<td>" . $quoteID . "</td><td>" . $row["CustomerName"] . "</td><td>" . $row["OrderTotal"] . "</td><td>";
          echo "<form action=\"../php/quoteTemplate.php\" method=\"POST\">";
              echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\"/>";
-             echo "<input type=\"hidden\" name=\"customerID\" value=\"$customerID\"/>";
+            //  echo "<input type=\"hidden\" name=\"customerID\" value=\"$customerID\"/>";
              echo "<button type=\"submit\">Edit Quote</button>";
          echo "</form>";
          echo "</td>\n";
