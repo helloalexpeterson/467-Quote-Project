@@ -1,7 +1,5 @@
--- Put this at the top
 DROP TABLE IF EXISTS PurchaseOrders, LineItems, Notes, Quotes, Employees;
 
---creates tables
 CREATE TABLE Employees (
     EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
     Email VARCHAR(32) NOT NULL,
@@ -60,5 +58,4 @@ CREATE TABLE PurchaseOrders(
     FOREIGN KEY (QuoteID) REFERENCES Quotes (QuoteID),
     FOREIGN KEY (EmployeeID) REFERENCES Employees (EmployeeID)
     
-    -- FOREIGN KEY (CustomerID) must match legacy db 
 );

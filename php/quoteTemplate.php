@@ -9,6 +9,24 @@
 <?php
 error_reporting(E_ALL);
 try {
+    include '../lib/db.php';
+
+    $pdo = connectdb();
+    $legacy = connectlegacy();
+   
+    $customerID = isset($_POST['customerID']) ? $_POST['customerID'] : '';
+    if ($customerID) {
+        $result = $legacy->query("SELECT * FROM customers where id = $customerID");
+        $cust = $result->fetchAll(PDO::FETCH_ASSOC);  
+    }
+    // GET QUOTE ID FROM FORM
+    $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID'] : '';
+    if ($quoteID) {
+        $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
+        // $result = $pdo->query("SELECT * FROM Quotes where QuoteID = 1");
+        $quote = $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     //IMPORTANT
     //IMPORTANT
     //INDIVIDUAL FORMS FOR EACH SECTION, HTML ALONES HAS NO NESTED FORMS
@@ -24,11 +42,11 @@ try {
     $new = isset($_POST['new']) ? $_POST['new'] : '';
 
     // Legacy DB values
-    $email = "From DB Table";
-    $CustomerName = isset($_POST['CustomerName']) ? $_POST['CustomerName'] : "Query DB for customer name";
-    $city = "City from Legacy";
-    $street = "Street from Legacy";
-    $contact = "Contacy from Legacy";
+    $email = isset($quote[0]['Email']) ? $quote[0]['Email'] : "No email found";
+    $CustomerName = isset($cust[0]['name']) ? $cust[0]['name'] : "Invalid customer selected";
+    $city = isset($cust[0]['city']) ? $cust[0]['city'] : "No city found";
+    $street = isset($cust[0]['street']) ? $cust[0]['street'] : "No street found";
+    $contact = isset($cust[0]['contact']) ? $cust[0]['contact'] : "No contact found";
     
     //Name and Address
     echo <<< html
@@ -59,7 +77,21 @@ try {
 
     // Line Items
     echo "<h1>Line Items:</h1>";
-    echo "query quote table";
+    
+    
+    $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
+    $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($lineItems as $row) {
+        // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
+        $ServiceDesc = $row["ServiceDesc"];
+        $Cost = $row["Cost"];
+        echo "<input type=\"text\" value=\"$ServiceDesc\"]>";
+        echo "<input type=\"text\" value=\"$Cost\"]><br>";
+        // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
+        // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";
+    }
+
     if ($action != "process") {
         echo <<< html
             EDITING/SAVE DELETING BUTTONS
@@ -84,6 +116,17 @@ try {
                 <button type="submit">Add Secret Note</button>
             </form>
         html;
+    }
+
+    $result = $pdo->query("SELECT * FROM Notes where QuoteID = $quoteID");
+    $secretNotes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($secretNotes as $row) {
+        // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
+        $Note = $row["Note"];
+        echo "<input type=\"text\" value=\"$Note\"]>";
+        // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
+        // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";
     }
 
     // Discount
