@@ -10,6 +10,7 @@
 error_reporting(E_ALL);
 try {
     include '../lib/db.php';
+    include '../lib/func.php';
 
     $pdo = connectdb();
     $legacy = connectlegacy();
