@@ -9,6 +9,45 @@
 <?php
 error_reporting(E_ALL);
 try {
+    include '../lib/db.php';
+    include '../lib/func.php';
+
+    $pdo = connectdb();
+    $legacy = connectlegacy();
+   
+    //if "Create New Quote is pushed"
+    if(!isset($_POST["quoteID"])){
+    
+        $id = $_POST['id']; 
+        $sql = "SELECT * FROM customers WHERE id = $id";
+        $result = $legacy->query($sql);
+        $row = $result->fetch(PDO::FETCH_ASSOC);   
+
+        echo "Calling openQuote function";
+        $quoteID = createQuote($pdo,  $_POST['id'], $row['name'], $row['city'], $row['street'], $row['contact'], $_POST['email']);
+
+        if($quoteID){ 
+            echo "<br>";
+            echo "Created a quote for {$row['name']}. <br> Quote number: {$quoteID}";
+            } else { echo "didn't create quote!";}
+        
+    }
+
+
+    // GET QUOTE ID FROM FORM
+    $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
+    if ($quoteID) {
+        $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
+        // $result = $pdo->query("SELECT * FROM Quotes where QuoteID = 1");
+        $quote = $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    // $customerID = $quote[0]["CustomerID"];
+    $customerID = isset($_POST['customerID']) ? $_POST['customerID'] : $quote[0]["CustomerID"];
+    if ($customerID) {
+        $result = $legacy->query("SELECT * FROM customers where id = $customerID");
+        $cust = $result->fetchAll(PDO::FETCH_ASSOC);  
+    }
+
     //IMPORTANT
     //IMPORTANT
     //INDIVIDUAL FORMS FOR EACH SECTION, HTML ALONES HAS NO NESTED FORMS
@@ -20,24 +59,35 @@ try {
     // POST values
     // THESE WILL CHANGE THE RENDERING AND AVAILABLE FUNCTIONS
     $action = isset($_POST['action']) ? $_POST['action'] : '';
-    $subAction = isset($_POST['subAction']) ? $_POST['subAction'] : '';
+    $formAction = isset($_POST['formAction']) ? $_POST['formAction'] : '';
     $new = isset($_POST['new']) ? $_POST['new'] : '';
 
     // Legacy DB values
-    $email = "From DB Table";
-    $CustomerName = isset($_POST['CustomerName']) ? $_POST['CustomerName'] : "Query DB for customer name";
-    $city = "City from Legacy";
-    $street = "Street from Legacy";
-    $contact = "Contacy from Legacy";
+    $email = isset($_POST['Email']) ? $_POST['Email'] : $quote[0]['Email'];
+    $CustomerName = isset($cust[0]['name']) ? $cust[0]['name'] : "Invalid customer selected";
+    $city = isset($cust[0]['city']) ? $cust[0]['city'] : "No city found";
+    $street = isset($cust[0]['street']) ? $cust[0]['street'] : "No street found";
+    $contact = isset($cust[0]['contact']) ? $cust[0]['contact'] : "No contact found";
     
+
+    //FORM FUNCTIONS
+
+    if ($formAction == "email") {
+        $prepared = $pdo->prepare("UPDATE Quotes SET Email=? WHERE QuoteID = $quoteID");
+        $prepared->execute([$email]);
+    }
+
+    //END OF FORM FUNC
+
+
     //Name and Address
     echo <<< html
         // DEBUG
         <h2>SAVE \$action TO php session IF POSSIBLE, ELSE NEED TO DISCUSS</h2>
         The page's action is set to 
         $action
-        <br>The page's subAction is set to 
-        $subAction
+        <br>The page's formAction is set to 
+        $formAction
         // DEBUG
     
     
@@ -48,23 +98,44 @@ try {
 
     // Email
     echo "<form id=\"email\" action=\"\" method=\"POST\">";
-        echo "<input type=\"hidden\" name=\"subAction\" value=\"email\">";
+        echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
+        echo "<input type=\"hidden\" name=\"formAction\" value=\"email\">";
         echo "Email: ";
-        echo "<input type=\"text\" name=\"email\" value=\"$email\"";
-        if ($action != "create") 
-            echo "disabled=\"disabled\">";
-        else
+        echo "<input type=\"text\" name=\"Email\" value=\"$email\"";
+        // if ($action != "create") 
+        //     echo "disabled=\"disabled\">";
+        // else
             echo "><button type=\"submit\">Save email</button>";
     echo "</form>";
 
     // Line Items
     echo "<h1>Line Items:</h1>";
-    echo "query quote table";
+    
+    
+    $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
+    $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($lineItems as $row) {
+        // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
+        $ServiceDesc = $row["ServiceDesc"];
+        $Cost = $row["Cost"];
+        echo "<form action='' method='POST'>";
+        echo "<input type=\"text\" value=\"$ServiceDesc\"]>";
+        echo "<input type=\"text\" value=\"$Cost\"]><br>";
+        echo "<input type='submit' name='editline'><br>";
+        echo "</form>";
+        // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
+        // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";
+
+
+  
+    }
+
     if ($action != "process") {
         echo <<< html
             EDITING/SAVE DELETING BUTTONS
             <form action="" method="POST">
-                <input type="hidden" name="subAction" value="addLine">
+                <input type="hidden" name="formAction" value="addLine">
                 <input type="text" name="ServiceDesc" placeholder="Service Description">
                 <input type="text" name="Cost" placeholder="Service Cost">
                 <button type="submit">Add Line Item</button>
@@ -79,17 +150,28 @@ try {
         echo <<< html
             EDITING/SAVE DELETING BUTTONS
             <form action="" method="POST">
-                <input type="hidden" name="subAction" value="addNote">
+                <input type="hidden" name="formAction" value="addNote">
                 <input type="text" name="Note" placeholder="Note">
                 <button type="submit">Add Secret Note</button>
             </form>
         html;
     }
 
+    $result = $pdo->query("SELECT * FROM Notes where QuoteID = $quoteID");
+    $secretNotes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($secretNotes as $row) {
+        // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
+        $Note = $row["Note"];
+        echo "<input type=\"text\" value=\"$Note\"]>";
+        // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
+        // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";
+    }
+
     // Discount
     echo <<< html
         <form id="discount" action="" method="POST">
-            <input type="hidden" name="subAction" value="discount">
+            <input type="hidden" name="formAction" value="discount">
             Discount: 
             <input type="text" name="discount" placeholder="%">
             <button type="submit">Apply</button>
@@ -101,7 +183,7 @@ try {
 
     // Create/Update Button
     echo "<form id=\"update\" action=\"\" method=\"POST\">";
-    echo "<input type=\"hidden\" name=\"subAction\" value=\"update\">";
+    echo "<input type=\"hidden\" name=\"formAction\" value=\"update\">";
         if($new)
             echo "<button type=\"submit\">Create</button>";
         else
@@ -119,7 +201,7 @@ try {
             //
             //
             //
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"foo\">";
+            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
             echo "<button type=\"submit\">Finalize Quote [TEMP: action=sanction][REQUIRE EMAIL]</button>";
         }
         else if($action == "sanction") {
@@ -131,7 +213,7 @@ try {
             //
             //
             //
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"foo\">";
+            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
             echo "<button type=\"submit\">Sanction Quote [TEMP: action=process]</button>";
         }
         else if($action == "process") {
@@ -143,7 +225,7 @@ try {
             //
             //
             //
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"foo\">";
+            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
             echo "<button type=\"submit\">Process PO [TEMP: action=done]</button>";
         }
         else {
@@ -156,7 +238,7 @@ try {
             //
             //
             //
-            echo "<input type=\"hidden\" name=\"subAction\" value=\"foo\">";
+            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
             echo "<button type=\"submit\">Unknown Action [TEMP: action=create]</button>";
         }
     echo "</form>";

@@ -33,3 +33,13 @@ VALUES ('1','400','1','New floor' );
 
 INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
 VALUES ('1','100','1','Gumball machine' );
+
+INSERT INTO Notes (QuoteID, Note)
+VALUES ('1', "Customer is very rude");
+
+INSERT INTO Notes (QuoteID, Note)
+VALUES ('1', "IBM is the literal worst");
+
+
+INSERT INTO Notes (QuoteID, Note)
+VALUES ('1', "Do not call back");
