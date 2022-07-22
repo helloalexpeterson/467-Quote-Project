@@ -15,8 +15,27 @@ try {
     $pdo = connectdb();
     $legacy = connectlegacy();
    
+    //if "Create New Quote is pushed"
+    if(!isset($_POST["quoteID"])){
+    
+        $id = $_POST['id']; 
+        $sql = "SELECT * FROM customers WHERE id = $id";
+        $result = $legacy->query($sql);
+        $row = $result->fetch(PDO::FETCH_ASSOC);   
+
+        echo "Calling openQuote function";
+        $quoteID = createQuote($pdo,  $_POST['id'], $row['name'], $row['city'], $row['street'], $row['contact'], $_POST['email']);
+
+        if($quoteID){ 
+            echo "<br>";
+            echo "Created a quote for {$row['name']}. <br> Quote number: {$quoteID}";
+            } else { echo "didn't create quote!";}
+        
+    }
+
+
     // GET QUOTE ID FROM FORM
-    $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID'] : '';
+    $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
     if ($quoteID) {
         $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
         // $result = $pdo->query("SELECT * FROM Quotes where QuoteID = 1");
@@ -100,10 +119,16 @@ try {
         // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
         $ServiceDesc = $row["ServiceDesc"];
         $Cost = $row["Cost"];
+        echo "<form action='' method='POST'>";
         echo "<input type=\"text\" value=\"$ServiceDesc\"]>";
         echo "<input type=\"text\" value=\"$Cost\"]><br>";
+        echo "<input type='submit' name='editline'><br>";
+        echo "</form>";
         // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
         // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";
+
+
+  
     }
 
     if ($action != "process") {
