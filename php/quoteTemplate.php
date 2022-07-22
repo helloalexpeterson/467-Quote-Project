@@ -43,7 +43,7 @@ try {
     $new = isset($_POST['new']) ? $_POST['new'] : '';
 
     // Legacy DB values
-    $email = isset($quote[0]['Email']) ? $quote[0]['Email'] : "No email found";
+    $email = isset($_POST['Email']) ? $_POST['Email'] : $quote[0]['Email'];
     $CustomerName = isset($cust[0]['name']) ? $cust[0]['name'] : "Invalid customer selected";
     $city = isset($cust[0]['city']) ? $cust[0]['city'] : "No city found";
     $street = isset($cust[0]['street']) ? $cust[0]['street'] : "No street found";
@@ -53,7 +53,6 @@ try {
     //FORM FUNCTIONS
 
     if ($formAction == "email") {
-        $email = isset($_POST['newEmail']) ? $_POST['newEmail'] : "No new email given";
         $prepared = $pdo->prepare("UPDATE Quotes SET Email=? WHERE QuoteID = $quoteID");
         $prepared->execute([$email]);
     }
@@ -82,7 +81,7 @@ try {
         echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
         echo "<input type=\"hidden\" name=\"formAction\" value=\"email\">";
         echo "Email: ";
-        echo "<input type=\"text\" name=\"newEmail\" value=\"$email\"";
+        echo "<input type=\"text\" name=\"Email\" value=\"$email\"";
         // if ($action != "create") 
         //     echo "disabled=\"disabled\">";
         // else
