@@ -33,7 +33,6 @@ try {
         
     }
 
-
     // GET QUOTE ID FROM FORM
     $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
     if ($quoteID) {
@@ -68,7 +67,6 @@ try {
     $city = isset($cust[0]['city']) ? $cust[0]['city'] : "No city found";
     $street = isset($cust[0]['street']) ? $cust[0]['street'] : "No street found";
     $contact = isset($cust[0]['contact']) ? $cust[0]['contact'] : "No contact found";
-    
 
     //FORM FUNCTIONS
 
@@ -76,9 +74,48 @@ try {
         $prepared = $pdo->prepare("UPDATE Quotes SET Email=? WHERE QuoteID = $quoteID");
         $prepared->execute([$email]);
     }
+    else if ($formAction == 'editLine') {
+        if (isset($_POST['lineID']) && isset($_POST['editDesc']) && is_numeric($_POST['editCost'])) {
+            // echo $_POST['editDesc'] . $_POST['editCost'] . $_POST['lineID'];
+            // $prepared = $pdo->prepare("UPDATE LineItems SET Cost=? WHERE LineID=?");
+            // $prepared->execute([11.2, 1]);
+            $prepared = $pdo->prepare("UPDATE LineItems SET ServiceDesc=?, Cost=? WHERE LineID=? AND quoteID = $quoteID");
+            // $prepared->execute(['new desc', 10.1, 1]);
+            $prepared->execute([$_POST['editDesc'], $_POST['editCost'], $_POST['lineID']]);
+        }
+        else {
+            echo "Error";
+        }
+    }
+    else if ($formAction == 'addLine') {
+        if (isset($_POST['addDesc']) && is_numeric($_POST['addCost'])) {
+            $prepared = $pdo->prepare("INSERT INTO LineItems SET ServiceDesc=?, Cost=?, quoteID=$quoteID");
+            $prepared->execute([$_POST['addDesc'], $_POST['addCost']]);
+        }
+        else {
+            echo "Error";
+        }
+    }
+    else if ($formAction == 'editNote') {
+        if (isset($_POST['noteID']) && isset($_POST['editNote'])) {
+            $prepared = $pdo->prepare("UPDATE Notes SET Note=? WHERE NoteID=? AND quoteID = $quoteID");
+            $prepared->execute([$_POST['editNote'], $_POST['noteID']]);
+        }
+        else {
+            echo "Error";
+        }
+    }
+    else if ($formAction == 'addNote') {
+        if (isset($_POST['addNote'])) {
+            $prepared = $pdo->prepare("INSERT INTO Notes SET Note=?, quoteID=$quoteID");
+            $prepared->execute([$_POST['addNote']]);
+        }
+        else {
+            echo "Error";
+        }
+    }
 
     //END OF FORM FUNC
-
 
     //Name and Address
     echo <<< html
@@ -117,12 +154,15 @@ try {
 
     foreach ($lineItems as $row) {
         // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
-        $ServiceDesc = $row["ServiceDesc"];
-        $Cost = $row["Cost"];
+        // $ServiceDesc = $row["ServiceDesc"];
+        // $Cost = $row["Cost"];
         echo "<form action='' method='POST'>";
-        echo "<input type=\"text\" value=\"$ServiceDesc\"]>";
-        echo "<input type=\"text\" value=\"$Cost\"]><br>";
-        echo "<input type='submit' name='editline'><br>";
+            echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
+            echo "<input type=\"text\" name='editDesc' value=\"{$row["ServiceDesc"]}\"]>";
+            echo "<input type=\"text\" name='editCost' value=\"{$row["Cost"]}\"]>";
+            echo "<input type=\"hidden\" name=\"lineID\" value=\"{$row['LineID']}\"/>";
+            echo "<button type=\"submit\" name='formAction' value='editLine'>Edit</button>";
+            echo "<button type=\"submit\" name='formAction' value='deleteLine'>Delete</button><br>";
         echo "</form>";
         // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
         // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";
@@ -132,40 +172,42 @@ try {
     }
 
     if ($action != "process") {
-        echo <<< html
-            EDITING/SAVE DELETING BUTTONS
-            <form action="" method="POST">
-                <input type="hidden" name="formAction" value="addLine">
-                <input type="text" name="ServiceDesc" placeholder="Service Description">
-                <input type="text" name="Cost" placeholder="Service Cost">
-                <button type="submit">Add Line Item</button>
-            </form>
-        html;
+        echo "<form action='' method='POST'>";
+            echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
+            echo "<input type='text' name='addDesc' placeholder='Service Description'>";
+            echo "<input type='text' name='addCost' placeholder='Service Cost'>";
+            echo "<input type='hidden' name='formAction' value='addLine'>";
+            echo "<button type='submit'>Add Line Item</button>";
+        echo "</form>";
     }
 
     // Secret Notes
     echo "<h1>Secret Notes:</h1>";
-    echo "query quote table";
-    if ($action != "process") {
-        echo <<< html
-            EDITING/SAVE DELETING BUTTONS
-            <form action="" method="POST">
-                <input type="hidden" name="formAction" value="addNote">
-                <input type="text" name="Note" placeholder="Note">
-                <button type="submit">Add Secret Note</button>
-            </form>
-        html;
-    }
+    // echo "query quote table";
 
     $result = $pdo->query("SELECT * FROM Notes where QuoteID = $quoteID");
     $secretNotes = $result->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($secretNotes as $row) {
         // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
-        $Note = $row["Note"];
-        echo "<input type=\"text\" value=\"$Note\"]>";
+        echo "<form action='' method='POST'>";
+            echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
+            echo "<input type=\"text\" name='editNote' value=\"{$row['Note']}\"]>";
+            echo "<input type=\"hidden\" name=\"noteID\" value=\"{$row['NoteID']}\"/>";
+            echo "<button type=\"submit\" name=\"formAction\" value=\"editNote\">Edit</button>";
+            echo "<button type=\"submit\" name=\"formAction\" value=\"deleteNote\">Delete</button><br>";
+         echo "</form>";
         // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
         // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";
+    }
+
+    if ($action != "process") {
+        echo "<form action='' method='POST'>";
+            echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
+            echo "<input type='text' name='addNote' placeholder='Note'>";
+            echo "<input type='hidden' name='formAction' value='addNote'>";
+            echo "<button type='submit'>Add Secret Note</button>";
+        echo "</form>";
     }
 
     // Discount
