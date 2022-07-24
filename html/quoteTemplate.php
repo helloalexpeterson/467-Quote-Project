@@ -279,7 +279,7 @@ try {
         echo "<form class='discountAmount' action='#discounted' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<label>Discount Amount: </label>";
-            echo "<input type='number' name='discount' placeholder='' min='0' step='0.01'>";
+            echo "<input type='number' name='discount' placeholder='' min='0' max='{$quote['OrderTotal']}' step='0.01'>";
             echo "<button type='submit' name='formAction' value='discountAmount'>Apply</button><br>";
             // echo "<input type='radio' name='formAction' value='discountPercent' checked>percent";
             // echo "<input type='radio' name='formAction' value='discountAmount'>amount";
@@ -362,6 +362,9 @@ function addToTotal($pdo, $quote, $quoteID, $cost) {
 
     $orderTotal = $quote['OrderTotal'] + $cost;
 
+    if($orderTotal < 0)
+        $orderTotal = 0;
+
     $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
     $prepared->execute([$orderTotal]);
 
@@ -380,6 +383,9 @@ function editTotal($pdo, $quote, $quoteID, $lineID, $cost) {
     $lineItem = $result->fetch(PDO::FETCH_ASSOC);
 
     $orderTotal = $quote['OrderTotal'] + $cost - $lineItem['Cost'];
+
+    if($orderTotal < 0)
+        $orderTotal = 0;
 
     $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
     $prepared->execute([$orderTotal]);
