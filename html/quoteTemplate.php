@@ -77,6 +77,7 @@ try {
     }
     else if ($formAction == 'editLine') {
         if (isset($_POST['lineID']) && isset($_POST['editDesc']) && is_numeric($_POST['editCost'])) {
+            $quote = editTotal($pdo, $quote, $quoteID, $_POST['lineID'], $_POST['editCost']);
             // echo $_POST['editDesc'] . $_POST['editCost'] . $_POST['lineID'];
             // $prepared = $pdo->prepare("UPDATE LineItems SET Cost=? WHERE LineID=?");
             // $prepared->execute([11.2, 1]);
@@ -92,6 +93,7 @@ try {
         if (isset($_POST['lineID'])) {
             $prepared = $pdo->prepare("DELETE FROM LineItems WHERE LineID=? AND quoteID=$quoteID");
             $prepared->execute([$_POST['lineID']]);
+            $quote = addToTotal($pdo, $quote, $quoteID, (-1 * $_POST['editCost']));
         }
         else {
             echo "Error deleting line";
@@ -101,6 +103,8 @@ try {
         if (isset($_POST['addDesc']) && is_numeric($_POST['addCost'])) {
             $prepared = $pdo->prepare("INSERT INTO LineItems SET ServiceDesc=?, Cost=?, quoteID=$quoteID");
             $prepared->execute([$_POST['addDesc'], $_POST['addCost']]);
+
+            $quote = addToTotal($pdo, $quote, $quoteID, $_POST['addCost']);
         }
         else {
             echo "Error adding line";
@@ -138,6 +142,9 @@ try {
         // echo $newTotal;
         $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
         $prepared->execute([$orderTotal]);
+
+        $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
+        $quote = $result->fetch(PDO::FETCH_ASSOC);
     }
     else if ($formAction == 'discountAmount') {
         $discount = (float)$_POST['discount'];
@@ -150,6 +157,9 @@ try {
             // echo $newTotal;
             $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
             $prepared->execute([$orderTotal]);
+
+            $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
+            $quote = $result->fetch(PDO::FETCH_ASSOC);
         }
     }
 
@@ -190,14 +200,19 @@ try {
     $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
     $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
 
+    $count = 0;
     foreach ($lineItems as $row) {
+        $count++;
+        if (isset($_POST['lineID']))
+            if ($count == $_POST['lineID'])
+                echo "<div id='editedLine'>";
         // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
         // $ServiceDesc = $row["ServiceDesc"];
         // $Cost = $row["Cost"];
-        echo "<form action='' method='POST'>";
+        echo "<form action='#editedLine' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<input type=\"text\" name='editDesc' value=\"{$row["ServiceDesc"]}\" required>";
-            echo "<input type=\"number\" name='editCost' value=\"{$row["Cost"]}\"] min='0'>";
+            echo "<input type=\"number\" name='editCost' value=\"{$row["Cost"]}\"] min='0' step='0.01'>";
             echo "<input type=\"hidden\" name=\"lineID\" value=\"{$row['LineID']}\"/>";
             echo "<button type=\"submit\" name='formAction' value='editLine'>Edit</button>";
             echo "<button type=\"submit\" name='formAction' value='deleteLine'>Delete</button><br>";
@@ -210,10 +225,10 @@ try {
     }
 
     if ($action != "process") {
-        echo "<form action='' method='POST'>";
+        echo "<form id='addedLine' action='#addedLine' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<input type='text' name='addDesc' placeholder='Service Description' required>";
-            echo "<input type='number' name='addCost' placeholder='Service Cost' min='0'>";
+            echo "<input type='number' name='addCost' placeholder='Service Cost' min='0' step='0.01'>";
             echo "<input type='hidden' name='formAction' value='addLine'>";
             echo "<button type='submit'>Add Line Item</button>";
         echo "</form>";
@@ -226,9 +241,14 @@ try {
     $result = $pdo->query("SELECT * FROM Notes where QuoteID = $quoteID");
     $secretNotes = $result->fetchAll(PDO::FETCH_ASSOC);
 
+    $count = 0;
     foreach ($secretNotes as $row) {
+        $count++;
+        if (isset($_POST['noteID']))
+            if ($count == $_POST['noteID'])
+                echo "<div id='editedNote'>";
         // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
-        echo "<form action='' method='POST'>";
+        echo "<form action='#editedNote' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<input type=\"text\" name='editNote' value=\"{$row['Note']}\" required>";
             echo "<input type=\"hidden\" name=\"noteID\" value=\"{$row['NoteID']}\"/>";
@@ -240,7 +260,7 @@ try {
     }
 
     if ($action != "process") {
-        echo "<form action='' method='POST'>";
+        echo "<form id='addedNote' action='#addedNote' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<input type='text' name='addNote' placeholder='Note' required>";
             echo "<input type='hidden' name='formAction' value='addNote'>";
@@ -249,21 +269,22 @@ try {
     }
 
     // Discount
-        echo "<form class='discountPercent' action='' method='POST'>";
+        echo "<form id='discounted' class='discountPercent' action='#discounted' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             // echo "<input type='hidden' name='formAction' value='discount'>";
             echo "<label>Discount %: </label>";
             echo "<input type='number' name='discount' placeholder='' min='0' max='100'>";
             echo "<button type='submit' name='formAction' value='discountPercent'>Apply</button><br>";
         echo "</form>";
-        echo "<form class='discountAmount' action='' method='POST'>";
+        echo "<form class='discountAmount' action='#discounted' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<label>Discount Amount: </label>";
             echo "<input type='number' name='discount' placeholder='' min='0' step='0.01'>";
-            echo "<button type='submit' name='formAction' value='discountAmount'>Apply</button>";
+            echo "<button type='submit' name='formAction' value='discountAmount'>Apply</button><br>";
             // echo "<input type='radio' name='formAction' value='discountPercent' checked>percent";
             // echo "<input type='radio' name='formAction' value='discountAmount'>amount";
-            echo "<br>Amount: {$orderTotal} table line item";
+            $orderTotal = number_format($quote['OrderTotal'],2);
+            echo "<label>Amount: {$orderTotal}</label>";
         echo "</form>";
 
     // Create/Update Button
@@ -330,6 +351,43 @@ try {
 }
 catch(PDOexception $e) {
     echo "Connection failed: " . $e->getMessage();
+}
+
+//dirty and inefficent
+//designed to run after after a quote query
+//returns updated quote query
+function addToTotal($pdo, $quote, $quoteID, $cost) {
+    // $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
+    // $quote = $result->fetch(PDO::FETCH_ASSOC);
+
+    $orderTotal = $quote['OrderTotal'] + $cost;
+
+    $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
+    $prepared->execute([$orderTotal]);
+
+    $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
+    $quote = $result->fetch(PDO::FETCH_ASSOC);
+
+    return $quote;
+}
+function editTotal($pdo, $quote, $quoteID, $lineID, $cost) {
+    // $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
+    // $quote = $result->fetch(PDO::FETCH_ASSOC);
+
+    // $orderTotal = $quote['OrderTotal'] + $cost;
+
+    $result = $pdo->query("SELECT * FROM LineItems WHERE LineID = $lineID AND QuoteID = $quoteID");
+    $lineItem = $result->fetch(PDO::FETCH_ASSOC);
+
+    $orderTotal = $quote['OrderTotal'] + $cost - $lineItem['Cost'];
+
+    $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
+    $prepared->execute([$orderTotal]);
+
+    $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
+    $quote = $result->fetch(PDO::FETCH_ASSOC);
+
+    return $quote;
 }
 ?>
 </body>
