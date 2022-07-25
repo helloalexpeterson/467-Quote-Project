@@ -8,12 +8,12 @@ h1 {
 h2 {
     color: teal;
 }
-#address, #email, #discount {
+.address, .email, .discountAmount {
     margin-bottom: 25px;
 }
-#discount {
+.discountPercent {
     margin-top: 25px;
 }
-#update {
+.update {
     text-align: right;
 }
