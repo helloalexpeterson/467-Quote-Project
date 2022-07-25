@@ -57,19 +57,21 @@ include '../lib/db.php';?>
                     
                     <?php foreach($rows as $employee ){
                         echo "<tr>";
+                       echo "<td><form method='POST' action='adminAddEmp.php'>";
                         echo "<td> {$employee['EmployeeID'] } </td>" ; 
+                        echo "<input type='hidden' name='empID' value='{$employee['EmployeeID'] }'>";
                         echo "<td> {$employee['EmpName'] } </td>" ; 
                         echo "<td> {$employee['Email'] } </td>" ; 
                         echo "<td> {$employee['Title'] } </td>" ;
                         echo "<td> {$employee['CommissionTotal'] } </td>" ;
-                        echo "<td><form action=''>";
-                        echo "<button type='submit' id='editAssociate'>Edit</button>";
-                        echo "<button type='submit' id='deleteAssociate'>Delete</button>";
+                        echo "<td><button type='submit' name='editAssociate' id='editAssociate'>Edit</button>";
+                        echo "<button type='submit' name='deleteAssociate' id='deleteAssociate'>Delete</button>";
                         echo "</form></td>";
                         echo "</tr>";
                     } 
+                   
                     ?>
-                
+                 </table>
                 </div>
               
             </div><br>

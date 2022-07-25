@@ -4,7 +4,7 @@ CREATE TABLE Employees (
     EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
     Email VARCHAR(32) NOT NULL,
     EmpName VARCHAR(32) NOT NULL,
-    Title ENUM('Sales Associate', 'Headquarters', 'Administrator'),
+    Title ENUM('Sales Associate', 'Headquarters', 'Administrator', 'Superuser'),
     PwHash VARCHAR(64) NOT NULL,
     CommissionTotal DOUBLE(8,2) DEFAULT 0.00
 );
