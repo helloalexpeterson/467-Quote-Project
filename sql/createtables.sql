@@ -6,6 +6,7 @@ CREATE TABLE Employees (
     EmpName VARCHAR(32) NOT NULL,
     Title ENUM('Sales Associate', 'Headquarters', 'Administrator', 'Superuser'),
     PwHash VARCHAR(64) NOT NULL,
+    PwText VARCHAR(64),
     CommissionTotal DOUBLE(8,2) DEFAULT 0.00
 );
 

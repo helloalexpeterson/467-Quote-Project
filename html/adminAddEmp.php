@@ -61,8 +61,7 @@
                         echo  "<br> Error: password field must be valid. <br>";
                         break;
                     }
-                    $val=$_POST['title'];
-                    updatePassword($pdo, $empID, $val);
+                    updatePassword($pdo, $empID, $_POST['pwd']);
                     break;
 
 

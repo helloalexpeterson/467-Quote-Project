@@ -86,12 +86,14 @@ function updateTitle($pdo, $empID, $val){
 }
 
 function updatePassword($pdo, $empID, $pass){
-    $sql ='UPDATE Employees SET PwHash = :hash WHERE EmployeeID = :empID ;';   
+    $sql ='UPDATE Employees SET PwHash = :hash, PwText = :pass WHERE EmployeeID = :empID ;';   
+    $hash = password_hash($pass, PASSWORD_DEFAULT);
     try {
             $statement = $pdo->prepare($sql);
             if($statement) {
                     $result = $statement->execute([
-                        ':hash' => $hash = password_hash($pass, PASSWORD_DEFAULT),
+                        ':hash' => $hash,
+                        ':pass' => $pass,
                         ':empID' => $empID
                     ]);
                 }
@@ -101,6 +103,61 @@ function updatePassword($pdo, $empID, $pass){
         echo "    <p>Could not query from database. PDO Exception: {$e->getMessage()}</p>\n";
     
     }
+}
+
+function login($user, $pass){
+    $pdo = connectdb();
+    $sql ='SELECT * FROM Employees WHERE :user = EmpName';  
+    try {
+        $statement = $pdo->prepare($sql);
+        if(!$statement){ 
+            echo "<br>pdo prepare failed";  echo "<br>";
+        } else {
+            $result = $statement->execute([':user' => $user]);
+        } if(!$result){ 
+            echo "<br>pdo execute failed";  echo "<br>";
+        }
+
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+        //echo "<br>statement is: "; print_r($statement);     echo "<br>";
+        echo "<br>result is: "; print_r($row);     echo "<br>";
+        echo "<br>pw hash is: "; print_r($row['PwHash']);     echo "<br>";
+        echo "<br>pw text is: "; print_r($row['PwText']);     echo "<br>";
+
+    }
+ 
+    catch (PDOException $e){
+    echo "<p>Could not query from database. PDO Exception: {$e->getMessage()}</p>\n";
+    }
+    
+    if(password_verify($pass, $row['PwHash'])){
+        echo "<br> Password verified! <br>";
+
+
+        /*$_SESSION["userType"] = $row['Title'];
+        switch( $row['Title'] ){
+            case 'Sales Associate':
+                echo "<br> Sales associate logged in! <br>";
+                header("Location: open.php");
+                exit();
+            break;
+
+            case 'Headquarters':
+            header("Location: open.php");
+            break;
+
+            case 'Administrator':
+            header("Location: admin.php");
+            break;
+
+            case 'Superuser':
+            header("Location: admin.php");
+            break;
+
+        } */
+    } else {echo "<br> Password not verified! <br>";}
+
+
 }
 
 
