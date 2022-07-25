@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<?php include 'header.php';?>
 <title>View Quote</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="../public/css/quote.css">
@@ -9,6 +10,7 @@
 <?php
 error_reporting(E_ALL);
 try {
+    
     include '../lib/db.php';
     include '../lib/func.php';
 
