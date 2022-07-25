@@ -31,4 +31,6 @@ function createQuote($pdo, $id, $name, $city, $street, $contact, $email)
 
 }
 
+function getUsers($pdo){};
+
 ?>

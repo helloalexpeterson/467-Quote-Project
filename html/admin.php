@@ -4,8 +4,9 @@
     //include "sales.php";
 ?>
 
-
-
+<?php include 'header.php';
+include '../lib/func.php';
+include '../lib/db.php';?>
 
 <!DOCTYPE html>
 
@@ -33,16 +34,44 @@
             </table>
         </div>
 
+        <?php 
+        $pdo = connectdb();
+        $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal FROM Employees";
+
+        $result = $pdo->query($sql);
+        $rows = $result->fetchAll(PDO::FETCH_ASSOC);
+        ?>
         <div class="adminActions">
             <div class="associatePreview">
                 <h2>Sales Associates</h2>
-                <hr>
+              
                 <div class="individualAssoc">
-                    <p id="associate">ID - Name - commission</p>
-                    <button type="text" id="editAssociate">Edit</button>
-                    <button type="text" id="deleteAssociate">Delete</button>
+                <table border='1'>
+                    <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Title</th>
+                    <th>Commission total</th>
+                    </tr>
+                    
+                    <?php foreach($rows as $employee ){
+                        echo "<tr>";
+                        echo "<td> {$employee['EmployeeID'] } </td>" ; 
+                        echo "<td> {$employee['EmpName'] } </td>" ; 
+                        echo "<td> {$employee['Email'] } </td>" ; 
+                        echo "<td> {$employee['Title'] } </td>" ;
+                        echo "<td> {$employee['CommissionTotal'] } </td>" ;
+                        echo "<td><form action=''>";
+                        echo "<button type='submit' id='editAssociate'>Edit</button>";
+                        echo "<button type='submit' id='deleteAssociate'>Delete</button>";
+                        echo "</form></td>";
+                        echo "</tr>";
+                    } 
+                    ?>
+                
                 </div>
-                <hr>
+              
             </div><br>
 
             <div class="addAssociate">

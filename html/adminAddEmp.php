@@ -1,5 +1,6 @@
 <?php
     include '../lib/db.php';
+    include '../lib/func.php';
 
     $pdo = connectdb();
 
