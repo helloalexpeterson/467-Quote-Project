@@ -8,6 +8,18 @@ include 'header.php';
 include '../lib/db.php';
 include '../lib/func.php';
 
+//debug print
+echo "ignore this - debug info"; 
+echo "<br>";
+echo "<pre>  'SESSION'";  
+print_r($_SESSION);   
+echo "</pre>" ;
+
+echo "<br>";
+echo "<pre>  'POST'";  
+print_r($_POST);   
+echo "</pre>" ;
+
 ?>
 <title>View Quote</title>
 <meta charset="utf-8">
@@ -144,8 +156,13 @@ try {
         }
     }
     else if ($formAction == 'discountPercent') {
-        $orderTotal = $quote['OrderTotal'] - (0.01 * (float)$_POST['discount'] * $quote['OrderTotal']);
-        // echo $newTotal;
+        $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
+        $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
+        $lineTotal=0;
+        foreach($lineItems as $line){
+            $lineTotal= $lineTotal + ($line['Cost']*$line['Quantity']); 
+        }
+        $orderTotal =   $lineTotal  - (0.01 * (float)$_POST['discount'] * $lineTotal);
         $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
         $prepared->execute([$orderTotal]);
 
@@ -153,13 +170,19 @@ try {
         $quote = $result->fetch(PDO::FETCH_ASSOC);
     }
     else if ($formAction == 'discountAmount') {
+        $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
+        $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
+        $lineTotal=0;
+        foreach($lineItems as $line){
+            $lineTotal= $lineTotal + ($line['Cost']*$line['Quantity']); 
+        }
         $discount = (float)$_POST['discount'];
         // echo $discount;
-        if ($discount > $quote['OrderTotal']) {
+        if ($discount > $lineTotal) {
             // echo "Error: discount too large";
         }
         else {
-            $orderTotal = $quote['OrderTotal'] - $discount;
+            $orderTotal = $lineTotal - $discount;
             // echo $newTotal;
             $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
             $prepared->execute([$orderTotal]);
@@ -171,19 +194,31 @@ try {
 
     //END OF FORM FUNC
 
-    //Name and Address
+    //Switch to disable email, notes, lines, discounts fields based on order status
     switch($quote['OrderStatus']){
+        case 'open':
+            $disableEmail = '';
+            $disableLines = '';
+            $disableNotes = '';
+            $disableDiscount = '';
+            $buttonText = 'Finalize Quote';
+            $buttonMsg = "To finalize this quote and submit it to processing in headquarters, click here: ";
+            break;
         case 'finalized':
             $disableEmail = 'disabled';
             $disableLines = '';
             $disableNotes = '';
             $disableDiscount = '';
+            $buttonText = 'Sanction Quote';
+            $buttonMsg = "To sanction this quote and email it to the customer, click here: ";
             break;
         case 'sanctioned':
             $disableEmail = 'disabled';
             $disableLines = 'disabled';
             $disableNotes = 'disabled';
             $disableDiscount = '';
+            $buttonText = 'Order Quote';
+            $buttonMsg = "To convert this quote into an order and process it, click here: ";            
             break;
         case 'ordered': 
             $disableEmail = 'disabled';
@@ -191,12 +226,7 @@ try {
             $disableNotes = 'disabled';
             $disableDiscount = 'disabled';
             break;
-        default:
-            $disableEmail = '';
-            $disableLines = '';
-            $disableNotes = '';
-            $disableDiscount = '';
-            break;
+        
     }
     echo <<< html
         // DEBUG
@@ -246,10 +276,7 @@ try {
             echo "<button type=\"submit\" name='formAction' value='deleteLine' $disableLines>Delete</button><br>";
         echo "</form>";
         // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
-        // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";
-
-
-  
+        // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";  
     }
 
     if ($action != "process") {
@@ -301,81 +328,44 @@ try {
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             // echo "<input type='hidden' name='formAction' value='discount'>";
             echo "<label>Discount %: </label>";
-            echo "<input type='number' name='discount' placeholder='' min='0' max='100'>";
-            echo "<button type='submit' name='formAction' value='discountPercent'>Apply</button><br>";
+            echo "<input type='number' name='discount' placeholder='' min='0' max='100'  $disableDiscount >";
+            echo "<button type='submit' name='formAction' value='discountPercent'  $disableDiscount >Apply</button><br>";
         echo "</form>";
         echo "<form class='discountAmount' action='#discounted' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<label>Discount Amount: </label>";
-            echo "<input type='number' name='discount' placeholder='' min='0' max='{$quote['OrderTotal']}' step='0.01'>";
-            echo "<button type='submit' name='formAction' value='discountAmount'>Apply</button><br>";
+            echo "<input type='number' name='discount' placeholder='' min='0' max='{$quote['OrderTotal']}' step='0.01'  $disableDiscount >";
+            echo "<button type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
             // echo "<input type='radio' name='formAction' value='discountPercent' checked>percent";
             // echo "<input type='radio' name='formAction' value='discountAmount'>amount";
             $orderTotal = number_format($quote['OrderTotal'],2);
-            echo "<label>Amount: {$orderTotal}</label>";
+            if(isset($lineTotal)){$discountTotal = $lineTotal - $orderTotal;}else{$discountTotal = 0;}
+            $discountTotal = round($discountTotal, $precision = 2);
+            echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
+            echo "<label>Amount: &dollar;{$orderTotal}</label>";
         echo "</form>";
 
-    // Create/Update Button
-    // echo "<form class=\"update\" action=\"\" method=\"POST\">";
-    // echo "<input type=\"hidden\" name=\"formAction\" value=\"update\">";
-    //     if($new)
-    //         echo "<button type=\"submit\">Create</button>";
-    //     else
-    //         echo "<button type=\"submit\">Update</button>";
-    // echo "</form>";
-
-    // View completion button
+    
+    if(isset($_POST['submitBtn']) && $_POST['submitBtn']===$buttonText){
+        echo "<br><p>Submit button pressed!</p> <br>";
+        advanceQuoteStatus($pdo, $buttonText, $quoteID, $email);
+        unset($_POST['submitBtn']);
+        
+    }    
+    //Finalize quote/Sanction Quote/Order quote button
+    if($quote['OrderStatus'] !== 'ordered'){ 
     echo "<form action=\"\" method=\"POST\">";
-        if($action == "create") {
-            echo "To finalize this quote and submit it to processing in headquarters, click here: ";
-            //
-            // TEMP TEST
-            //
-            echo "<input type=\"hidden\" name=\"action\" value=\"sanction\">";
-            //
-            //
-            //
-            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
-            echo "<button type=\"submit\">Finalize Quote [TEMP: action=sanction][REQUIRE EMAIL]</button>";
-        }
-        else if($action == "sanction") {
-            echo "To sanction this quote and email it to the customer, click here: ";
-            //
-            // TEMP TEST
-            //
-            echo "<input type=\"hidden\" name=\"action\" value=\"process\">";
-            //
-            //
-            //
-            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
-            echo "<button type=\"submit\">Sanction Quote [TEMP: action=process]</button>";
-        }
-        else if($action == "process") {
-            echo "To convert this quote into an order and process it, click here: ";
-            //
-            // TEMP TEST
-            //
-            echo "<input type=\"hidden\" name=\"action\" value=\"done\">";
-            //
-            //
-            //
-            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
-            echo "<button type=\"submit\">Process PO [TEMP: action=done]</button>";
-        }
-        else {
-            //
-            // TEMP TEST
-            //
-            echo "<input type=\"hidden\" name=\"action\" value=\"create\">";
-            echo "<input type=\"hidden\" name=\"new\" value=\"1\">";
-            echo "<input type=\"hidden\" name=\"CustomerName\" value=\"????Get Customer Name from POST value??????\">";
-            //
-            //
-            //
-            echo "<input type=\"hidden\" name=\"formAction\" value=\"foo\">";
-            echo "<button type=\"submit\">Unknown Action [TEMP: action=create]</button>";
-        }
+      
+        $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
+
+        echo "<input type=hidden name='quoteID' value={$quoteID}>";
+        echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
+        echo "<button type=submit name=submitBtn value='{$buttonText}' id=submitBtn>$buttonText</button>";
+        //echo "<script type='text/javascript'>alert('Username'".$username.");</script>";
     echo "</form>";
+    }
+   
+
 }
 catch(PDOexception $e) {
     echo "Connection failed: " . $e->getMessage();
