@@ -133,13 +133,11 @@ function login($user, $pass){
     if(password_verify($pass, $row['PwHash'])){
         echo "<br> Password verified! <br>";
 
-
-        /*$_SESSION["userType"] = $row['Title'];
+        $_SESSION["userID"] = $row['EmployeeID'];
+        $_SESSION["userType"] = $row['Title'];
         switch( $row['Title'] ){
             case 'Sales Associate':
-                echo "<br> Sales associate logged in! <br>";
-                header("Location: open.php");
-                exit();
+            header("Location: open.php");
             break;
 
             case 'Headquarters':
@@ -154,7 +152,7 @@ function login($user, $pass){
             header("Location: admin.php");
             break;
 
-        } */
+        } 
     } else {echo "<br> Password not verified! <br>";}
 
 

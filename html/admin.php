@@ -1,3 +1,6 @@
+<?php  
+session_start(['name' => 'quotes']); 
+?>
 <!DOCTYPE html>
 <html>
 <head>

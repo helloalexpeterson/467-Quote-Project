@@ -1,13 +1,14 @@
-<?php
+<?php  
+session_start(['name' => 'quotes']); 
     $view="associate";
     $querytype="open";
     $buttontext = "edit quote";
     $pagename ="open.php";
 ?>
-
 <!DOCTYPE html>
 <html>
   <head>
+  <?php include 'header.php'; ?>
   <h2> Create new quote for customer </h2> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Select Customer</title>
@@ -18,10 +19,15 @@
     <style type="text/css">.body { width: auto; }</style>
     
 <?php
-    //include '../lib/db.php';
-    include '../lib/func.php';
+include '../lib/func.php';
+include '../lib/db.php';
+    
    //debug print
    echo "ignore this - debug info"; 
+   echo "<br>";
+   echo "<pre>  'SESSION'";  
+   print_r($_SESSION);   
+   echo "</pre>" ;
 
    echo "<br>";
    echo "<pre>  'POST'";  

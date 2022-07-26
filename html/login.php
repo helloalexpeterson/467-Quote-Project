@@ -1,6 +1,8 @@
+<?php  
+session_start(['name' => 'quotes']); 
+?>
 <!DOCTYPE html>
 <?php
-session_start();
 include '../lib/func.php';
 include '../lib/db.php';
 //include '../lib/db.php';
@@ -20,11 +22,12 @@ include '../lib/db.php';
   <body>
 <?php 
   print_r($_POST);
+if(isset($_POST['action'])){
   if($_POST['action']=='login'){
-    echo "LOGIN";
+ 
     login($_POST['user'],$_POST['pass'] );
 
-  }
+  }}
 
 ?>
     <center> 

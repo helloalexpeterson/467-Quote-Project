@@ -1,10 +1,12 @@
-<?php
+<?php  
+session_start(['name' => 'quotes']); 
+
     include '../lib/db.php';
     include '../lib/func.php';
 
     $pdo = connectdb();
 
-    //collect form data
+    //create new user
     if(isset($_POST['submit'])){
         $email = $_POST['email'];
         $empName = $_POST['empName'];
