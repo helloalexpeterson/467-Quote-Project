@@ -21,7 +21,11 @@ include '../lib/db.php';
   </head>
   <body>
 <?php 
-  print_r($_POST);
+if(isset($_POST["logout"]))
+{   echo "User {$_SESSION['username']} logged out.<br>";
+    unset($_SESSION['quotes']);
+}
+  //print_r($_POST);
 if(isset($_POST['action'])){
   if($_POST['action']=='login'){
  

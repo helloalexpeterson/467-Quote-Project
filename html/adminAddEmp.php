@@ -93,6 +93,10 @@ session_start(['name' => 'quotes']);
                     echo "<input type='hidden' name='editAssociate' value='{$editAssociate}'><br>";
                     echo "<input type='hidden' name='empID' value='{$empID}'><br>";
         echo "</form>";
+
+        echo <<<HTML
+        <form action='admin.php' method='POST'> <input type='submit' name='back' value='Return to admin'></form>
+        HTML;
         
     }
     

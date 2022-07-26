@@ -1,14 +1,52 @@
 <?php  
 session_start(['name' => 'quotes']); 
-    $view="associate";
-    $querytype="open";
-    $buttontext = "edit quote";
-    $pagename ="open.php";
+
+  
 ?>
 <!DOCTYPE html>
 <html>
   <head>
-  <?php include 'header.php'; ?>
+  <?php include 'header.php'; 
+  
+  switch($_SESSION['userType']){
+    case 'Sales Associate':
+      $querytype="open";
+      $buttonText = "Edit Quote";
+      echo "<br> Query type is: $querytype<br>";
+      break;
+
+      case 'Headquarters':
+      $querytype="finalized";
+      $buttonText = "Sanction Quote";
+      if(isset($_POST['menuType']) && $_POST['menuType'] === 'Sanctioned Quotes'){
+        $buttonText = "Order Quote";
+        $querytype="sanctioned";
+        echo "<br>Query type is: $querytype<br>";
+        break;
+      }
+      if(isset($_POST['menuType']) && $_POST['menuType'] === 'Ordered Quotes'){
+        $buttonText = "Review Quote";
+        $querytype="ordered";
+        echo "<br>Query type is: $querytype<br>";
+        break;
+      }
+      echo "<br> Query type is: $querytype<br>";
+      break;
+
+     
+
+      default:
+      echo "You do not have permission to view this page. Please login as the appropriate user.";
+       
+     echo <<<HTML
+    <form action='login.php' method='POST'> <input type='submit' name='fail' value='Return to login'></form>
+    HTML;
+      exit();
+
+  }
+  
+  
+  ?>
   <h2> Create new quote for customer </h2> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Select Customer</title>
@@ -21,7 +59,7 @@ session_start(['name' => 'quotes']);
 <?php
 include '../lib/func.php';
 include '../lib/db.php';
-    
+
    //debug print
    echo "ignore this - debug info"; 
    echo "<br>";
@@ -50,7 +88,7 @@ $mydb = connectdb();
 <?php 
 
   //if an associate clicks the link
-  if($view=="associate") 
+  if(isset($_SESSION['userType']) && $_SESSION['userType'] === 'Sales Associate') 
   { 
 
     $sql = "SELECT id, name FROM customers";
@@ -75,26 +113,22 @@ $mydb = connectdb();
     echo "<input type='text' name='email'>"; 
     echo "<input type='submit' name='newquote' value='Create New Quote'> <p>This will direct to a new page</p>";
     echo "</form>";
-        
-
   }
   
 ?>
 
-
 <?php 
-  //if an admin clicks the link
-
-if($view=="admin") 
-  { 
-   echo "This would be the master quote lookup";
-  }
-
-  ?>
-    <?php echo "<h3>List of $querytype quotes:</h3>"?>
-    <?php 
+    echo "<h3>List of $querytype quotes:</h3>";
     $db = connectdb();
     $dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal FROM Quotes WHERE OrderStatus = '$querytype';";
+
+    /* enable this feature if we want to only show quotes for logged in associate
+    if($_SESSION['userType'] === 'Sales Associate')
+    {
+      $userID = $_SESSION['userID'];
+      $dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal FROM Quotes WHERE OrderStatus = '$querytype' AND Quotes.EmployeeID = '$userID';";
+    } */
+
     $dresult = $db->query($dbsql);
     $dbrow = $dresult->fetchAll(PDO::FETCH_ASSOC);
 
@@ -106,7 +140,7 @@ if($view=="admin")
         <th>Name</th>
         <th>Order Total</th>
         </tr>";
-
+    
         foreach($dbrow as $row){
         echo "<tr>";
         echo "<td> {$row['QuoteID'] } </td>" ; 
@@ -114,15 +148,11 @@ if($view=="admin")
         echo "<td> {$row['OrderTotal'] } </td>" ; 
         echo "<td><form action=\"quoteTemplate.php\" method=\"POST\">";
              echo "<input type=\"hidden\" name=\"quoteID\" value=\"{$row['QuoteID']}\"/>";
-             echo "<button type=\"submit\">Edit Quote</button> ";
+             echo "<button type=\"submit\">$buttonText</button> ";
          echo "</form></td>";
 
         echo "</tr>";
-
-
     }
-
-    
     ?>
   </body>
 </html>

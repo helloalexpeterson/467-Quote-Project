@@ -135,8 +135,9 @@ function login($user, $pass){
 
         $_SESSION["userID"] = $row['EmployeeID'];
         $_SESSION["userType"] = $row['Title'];
+        $_SESSION["username"] = $row['EmpName'];
         switch( $row['Title'] ){
-            case 'Sales Associate':
+            case 'Sales Associate':    
             header("Location: open.php");
             break;
 
