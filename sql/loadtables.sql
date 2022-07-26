@@ -1,8 +1,14 @@
-INSERT INTO Employees (Email, EmpName, Title, PwHash)
-VALUES ('z1912480@niu.edu', 'Alex Peterson', 'Sales Associate', '1234');
+INSERT INTO Employees (Email, EmpName, Title, PwHash, PwText)
+VALUES ('z1912480@niu.edu', 'Alex Peterson', 'Sales Associate', '1234', '1234');
 
 INSERT INTO Employees(Email, EmpName, Title, PwHash)
 VALUES ('bighead@aol.com', 'John Smith', 'Headquarters', '5678');
+
+INSERT INTO Employees(Email, EmpName, Title, PwHash)
+VALUES ('me@me.com', 'Jane Doe', 'Administrator', 'abcd');
+
+INSERT INTO Employees(Email, EmpName, Title, PwHash)
+VALUES ('megamind@gmail.com', 'Megamind', 'Superuser', 'efgh');
 
 INSERT INTO Quotes (CustomerID, CustomerName, City, Street, Contact, Email, EmployeeID, OrderStatus, CommissionRate, OrderTotal)
 VALUES ('1','IBM Corporation', 'Armonk, NY', 'The IBM Way', '1-800-CALL-IBM', 'ibm@ibm.ibm', '1', 'open', '5', '1000');

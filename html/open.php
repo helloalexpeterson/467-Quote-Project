@@ -3,7 +3,6 @@
     $querytype="open";
     $buttontext = "edit quote";
     $pagename ="open.php";
-    //include "sales.php";
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +18,7 @@
     <style type="text/css">.body { width: auto; }</style>
     
 <?php
-    include '../lib/db.php';
+    //include '../lib/db.php';
     include '../lib/func.php';
    //debug print
    echo "ignore this - debug info"; 

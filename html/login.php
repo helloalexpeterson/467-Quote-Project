@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<?php
+session_start();
+include '../lib/func.php';
+include '../lib/db.php';
+//include '../lib/db.php';
+//session code here
+?>
 <html>
   <head>
   <center> <h1> Login </h1></center> 
@@ -11,13 +18,22 @@
     <style type="text/css">.body { width: auto; }</style>
   </head>
   <body>
+<?php 
+  print_r($_POST);
+  if($_POST['action']=='login'){
+    echo "LOGIN";
+    login($_POST['user'],$_POST['pass'] );
+
+  }
+
+?>
     <center> 
-    <form action="sales.php">
-    <label for="fname">Username:</label><br>
-    <input type="text" id="fname" name="fname" value=""><br>
-    <label for="lname">Password:</label><br>
-    <input type="text" id="lname" name="lname" value=""><br><br>
-    <input type="submit" value="Submit">
+    <form action="login.php" method="POST">
+    <label >Username:</label><br>
+    <input type="text" id="user" name="user" value=""><br>
+    <label >Password:</label><br>
+    <input type="text" id="pass" name="pass" value=""><br><br>
+    <input type="submit" value="login" name="action">
     </form> 
     </center> 
   </body>
