@@ -1,6 +1,8 @@
+<?php  
+session_start(['name' => 'quotes']); 
+?>
 <!DOCTYPE html>
 <?php
-session_start();
 include '../lib/func.php';
 include '../lib/db.php';
 //include '../lib/db.php';
@@ -19,12 +21,17 @@ include '../lib/db.php';
   </head>
   <body>
 <?php 
-  print_r($_POST);
+if(isset($_POST["logout"]) && isset($_SESSION['username']))
+{   echo "User: {$_SESSION['username']} logged out.<br>";
+    unset($_SESSION['quotes']);
+}
+  //print_r($_POST);
+if(isset($_POST['action'])){
   if($_POST['action']=='login'){
-    echo "LOGIN";
+ 
     login($_POST['user'],$_POST['pass'] );
 
-  }
+  }}
 
 ?>
     <center> 
@@ -36,5 +43,7 @@ include '../lib/db.php';
     <input type="submit" value="login" name="action">
     </form> 
     </center> 
+
+
   </body>
 </html>

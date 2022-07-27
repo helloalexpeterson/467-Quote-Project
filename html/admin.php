@@ -1,3 +1,6 @@
+<?php  
+session_start(['name' => 'quotes']); 
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,18 +19,6 @@ include '../lib/db.php';
 </head>
 
 <body>
-    <div class="wrapper">
-        <div class="nav">
-            <table>
-                <tr>
-                    <th>Plant Repair:</th>
-                    <th>Admin</th>
-                    <th><a href="" id="associatesLink">Associates</a></th>
-                    <th><a href="" id="quotesLink">Quotes</a></th>
-                </tr>
-            </table>
-        </div>
-
     <?php 
     $pdo = connectdb();
     $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal FROM Employees";

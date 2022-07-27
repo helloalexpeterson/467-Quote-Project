@@ -1,10 +1,12 @@
-<?php
+<?php  
+session_start(['name' => 'quotes']); 
+
     include '../lib/db.php';
     include '../lib/func.php';
 
     $pdo = connectdb();
 
-    //collect form data
+    //create new user
     if(isset($_POST['submit'])){
         $email = $_POST['email'];
         $empName = $_POST['empName'];
@@ -92,6 +94,10 @@
                     echo "<input type='hidden' name='editAssociate' value='{$editAssociate}'><br>";
                     echo "<input type='hidden' name='empID' value='{$empID}'><br>";
         echo "</form>";
+
+        echo <<<HTML
+        <form action='admin.php' method='POST'> <input type='submit' name='back' value='Return to admin'></form>
+        HTML;
         
     }
     
