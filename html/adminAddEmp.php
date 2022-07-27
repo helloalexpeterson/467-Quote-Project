@@ -71,21 +71,22 @@
         echo <<<HTML
         <form method="POST" action="adminAddEmp.php"> 
                     <br>
+                    <h3>Update User:</h3>
                     <label for="empName">Name:</label>
-                    <input type="text" id="empName" name="empName" placeholder="Associate name"><br>
+                    <input type="text" id="empName" name="empName" placeholder="Associate name">
                     <input type="submit" name="action" value="Update name"><br>
                     <label for="pwd">Password:</label>
-                    <input type="password" id="pwd" name="pwd" placeholder="Associate password"><br>
+                    <input type="password" id="pwd" name="pwd" placeholder="Associate password">
                     <input type="submit" name="action" value="Update password"><br>
                     <label for="email">E-mail:</label>
-                    <input type="email" id="email" name="email" placeholder="Associate E-mail"><br><br>
-                    <input type="submit" name="action" value="Update email"><br>
+                    <input type="email" id="email" name="email" placeholder="Associate E-mail">
+                    <input type="submit" name="action" value="Update email"><br><br>
                     <label for="title">Title:</label>
                     <select id="title" name="title">
                         <option value="Sales Associate">Sales Associate</option>
                         <option value="Headquarters">Headquarters</option>
                         <option value="Administrator">Administrator</option>
-                    </select><br><br>
+                    </select>
                     <input type="submit" name="action" value="Update title"><br>
         HTML;
                     echo "<input type='hidden' name='editAssociate' value='{$editAssociate}'><br>";
