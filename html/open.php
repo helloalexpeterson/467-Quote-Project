@@ -115,7 +115,7 @@ $mydb = connectdb();
   
 
   //if an associate is logged in link
-  if(isset($_SESSION['userType']) && $_SESSION['userType'] == 'Sales Associate' || $_SESSION['userType'] == 'Superuser' ) 
+  if(isset($_SESSION['userType']) && $_SESSION['userType'] == 'Sales Associate' || $_POST['menuType'] == 'Open Quotes' ) 
   { 
 
     $sql = "SELECT id, name FROM customers";
