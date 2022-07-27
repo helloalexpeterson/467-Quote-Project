@@ -22,6 +22,9 @@ CREATE TABLE Quotes (
     OrderStatus ENUM('open', 'finalized', 'sanctioned', 'ordered'),
     CommissionRate INT(2),
     OrderTotal DECIMAL(10, 2) DEFAULT 0.00,
+    DateOpened DATE DEFAULT CURRENT_DATE(),
+    DateModified DATE DEFAULT CURRENT_DATE(),
+    DateProcessed DATE,
 
     FOREIGN KEY(EmployeeID) REFERENCES Employees
 );
