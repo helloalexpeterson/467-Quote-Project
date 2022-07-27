@@ -100,6 +100,7 @@
         $empID = $_POST['empID'];
         $prepared = $pdo->exec("DELETE FROM Employees WHERE EmployeeID = $empID ");
         //$prepared->execute();
+        header("Location: admin.php");
 
     }
 
