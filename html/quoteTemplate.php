@@ -1,12 +1,18 @@
 <?php session_start(['name' => 'quotes']); ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<?php 
 
-include 'header.php';
+<?php 
 include '../lib/db.php';
 include '../lib/func.php';
+
+  //************move this to the top
+  if(isset($_POST['submitBtn']) && isset($_POST['submitBtn'])){
+    echo "***6***";
+    advanceQuoteStatus($_POST['quoteID'], $_POST['submitBtn']); //this is broken now
+    echo "***7***";
+    unset($_POST['submitBtn']);
+    //header('location:open.php');
+}    
+include 'header.php';
 
 //debug print
 echo "ignore this - debug info"; 
@@ -21,6 +27,9 @@ print_r($_POST);
 echo "</pre>" ;
 
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <title>View Quote</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="../public/css/quote.css">
@@ -155,28 +164,33 @@ try {
             echo "Error adding secret note";
         }
     }
-    else if ($formAction == 'discountPercent') {
+    else if ($formAction == 'discountPercent' && isset($_POST['discount'])) {
         $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
         $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
         $lineTotal=0;
         foreach($lineItems as $line){
-            $lineTotal= $lineTotal + ($line['Cost']*$line['Quantity']); 
+            $lineTotal= $lineTotal + ($line['Cost']); 
         }
+        if(isset($_POST['discount'])){
         $orderTotal =   $lineTotal  - (0.01 * (float)$_POST['discount'] * $lineTotal);
+        } else {  
+          $orderTotal = $lineTotal;  
+        }
         $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
         $prepared->execute([$orderTotal]);
 
         $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
         $quote = $result->fetch(PDO::FETCH_ASSOC);
     }
-    else if ($formAction == 'discountAmount') {
+    else if ($formAction == 'discountAmount' && isset($_POST['discount'])) {
         $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
         $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
         $lineTotal=0;
         foreach($lineItems as $line){
-            $lineTotal= $lineTotal + ($line['Cost']*$line['Quantity']); 
+            $lineTotal= $lineTotal + ($line['Cost']); 
         }
         $discount = (float)$_POST['discount'];
+        //if(isset($_POST['discount'])){} else {$discount = 0;}
         // echo $discount;
         if ($discount > $lineTotal) {
             // echo "Error: discount too large";
@@ -225,6 +239,7 @@ try {
             $disableLines = 'disabled';
             $disableNotes = 'disabled';
             $disableDiscount = 'disabled';
+            $buttonText = '';
             break;
         
     }
@@ -257,7 +272,7 @@ try {
     
     $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
     $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
-
+    $lineTotalB = 0;
     $count = 0;
     foreach ($lineItems as $row) {
         $count++;
@@ -338,20 +353,15 @@ try {
             echo "<button type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
             // echo "<input type='radio' name='formAction' value='discountPercent' checked>percent";
             // echo "<input type='radio' name='formAction' value='discountAmount'>amount";
-            $orderTotal = number_format($quote['OrderTotal'],2);
-            if(isset($lineTotal)){$discountTotal = $lineTotal - $orderTotal;}else{$discountTotal = 0;}
+            //$orderTotal = number_format($quote['OrderTotal'],2);
+            if(isset($lineTotal)){
+            $discountTotal = $lineTotal - $orderTotal;
             $discountTotal = round($discountTotal, $precision = 2);
             echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
+            }
             echo "<label>Amount: &dollar;{$orderTotal}</label>";
         echo "</form>";
 
-    
-    if(isset($_POST['submitBtn']) && $_POST['submitBtn']===$buttonText){
-        echo "<br><p>Submit button pressed!</p> <br>";
-        advanceQuoteStatus($pdo, $buttonText, $quoteID, $email);
-        unset($_POST['submitBtn']);
-        
-    }    
     //Finalize quote/Sanction Quote/Order quote button
     if($quote['OrderStatus'] !== 'ordered'){ 
     echo "<form action=\"\" method=\"POST\">";

@@ -158,31 +158,45 @@ function login($user, $pass){
 
 }
 
-function advanceQuoteStatus($pdo, $buttonText, $quoteID, $email){
-    
+function advanceQuoteStatus($quoteID, $buttonText){
+    echo "***1***";
+    $pdo = connectdb();
+    echo "***2***";
     switch($buttonText){
         case 'Finalize Quote':
             $sql = "UPDATE Quotes SET OrderStatus = 'finalized' WHERE QuoteID = $quoteID";
-            echo "<script>alert('Quote #$quoteID finalized and sent to Headquarters.');</script>";
+            $prepared = $pdo->prepare($sql);
+            if($prepared){ 
+                $prepared->execute();
+            } 
+            //echo "<script>alert('Quote #$quoteID finalized and sent to Headquarters.');</script>";
+            echo "***3***";
             break;
+
         case 'Sanction Quote':
             $sql = "UPDATE Quotes SET OrderStatus = 'sanctioned' WHERE QuoteID = $quoteID";
-            echo "<script>alert('Quote #$quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to $email');</script>";
-
+            $prepared = $pdo->prepare($sql);
+            if($prepared){ 
+                $prepared->execute();
+            } 
+           // echo "<script>alert('Quote #$quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to $email');</script>";
+           echo "***4***";
             break;
+
         case 'Order Quote':          
             $sql = "UPDATE Quotes SET OrderStatus = 'ordered' WHERE QuoteID = $quoteID";
-            echo "<script>alert('Quote #$quoteID submitted for purchasing. A copy of this order has been sent to $email');</script>";
-
+            $prepared = $pdo->prepare($sql);
+            if($prepared){ 
+                $prepared->execute();
+            } 
+            //echo "<script>alert('Quote #$quoteID submitted for purchasing. A copy of this order has been sent to $email');</script>";
             break;
+            
           default:
           echo "advance quote status error";
         }
 
-        $prepared = $pdo->prepare($sql);
-        if($prepared){ 
-            $prepared->execute();
-        } 
+        
         
         //echo "<script>alert('Quote #$quoteID submitted.');</script>";
         //  echo "<script type='text/javascript'>alert('Quote #'".$quoteID.");</script>";

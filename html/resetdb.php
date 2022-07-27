@@ -41,8 +41,9 @@ try {
             $sql = file_get_contents("../sql/loadtables.sql");
             $prepared = $pdo->prepare($sql);
             $prepared->execute();
-            echo "Successfully loaded data.";
+            echo "Successfully loaded data.";  
         }
+
     }
 }
 catch(PDOexception $e) {
