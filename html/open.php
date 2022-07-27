@@ -35,7 +35,30 @@ session_start(['name' => 'quotes']);
       }
       echo "<br> Query type is: $querytype<br>";
       break;
-
+      // probably shoulda used if statements or a different variable to deal with superusers priveleges 
+      case 'Superuser':
+        if ($_POST['menuType'] == 'Open Quotes'){
+          $querytype="open";
+          $buttonText = "Edit Quote";
+          $headermsg =  "Create new quote for customer"; 
+        }
+        else if ($_POST['menuType'] == 'Finalized Quotes'){
+          $querytype="finalized";
+          $buttonText = "Sanction Quote";
+          $headermsg =  "Sanction finalized quotes"; 
+        }
+        else if ($_POST['menuType'] == 'Sanctioned Quotes'){
+          $buttonText = "Order Quote";
+          $querytype="sanctioned";
+          $headermsg =  "Order sanctioned quotes";
+        }
+        else if ($_POST['menuType'] == 'Ordered Quotes'){
+          $buttonText = "Review Quote";
+          $querytype="ordered";
+          $headermsg =  "Review quotes submitted for purchase";
+        }
+        echo "<br> Query type is: $querytype<br>";
+        break;
       default:
       echo "You do not have permission to view this page. Please login as the appropriate user.";
        
@@ -102,19 +125,22 @@ $mydb = connectdb();
 
     echo"<form action='quoteTemplate.php' method='POST'>";
     echo "<label for='id'>First, select a customer:</label><br>";
-    echo "<select id='id' name='id'>";
-      echo "<option value='selected'>Choose one</option>";
+    echo "<select id='id' name='id' required>";
+    echo "<option value='' disabled selected>Choose one</option>";
 
+    $custCount = 0;
         // Iterating through the array of customers
         foreach($row as $customer => $index){
+          $custCount++;
           echo "<option value={$index['id']}>{$index['name']}</option>";
       }
 
     echo "</select> ";  
+    echo "<b>$custCount total customers</b>";
 
     echo "<br>";
     echo "<label for='email'>Input the customer's email to begin quote:</label><br>  ";
-    echo "<input type='text' name='email'>"; 
+    echo "<input type='email' name='email' required>"; 
     echo "<input type='submit' name='newquote' value='Create New Quote'> <p>This will direct to a new page</p>";
     echo "</form>";
   }
@@ -145,7 +171,9 @@ $mydb = connectdb();
         <th>Order Total</th>
         </tr>";
     
+        $quoteCount = 0;
         foreach($dbrow as $row){
+          $quoteCount++;
         echo "<tr>";
         echo "<td> {$row['QuoteID'] } </td>" ; 
         echo "<td> {$row['CustomerName'] } </td>" ; 
@@ -157,6 +185,8 @@ $mydb = connectdb();
 
         echo "</tr>";
     }
+    echo "</table>";
+    echo "<b>$quoteCount quotes found</b>";
     ?>
   </body>
 </html>

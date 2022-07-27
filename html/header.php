@@ -1,5 +1,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <?php 
+echo "<header>";
 echo "<th> Logged in as: {$_SESSION['username']} - {$_SESSION['userType']}</th>";
 
 
@@ -73,5 +74,10 @@ if($_SESSION['userType'] == 'Sales Associate'){
        </div>
        HTML;
    } 
-
+echo "</header>";
 ?>
+<style>
+header {
+  background-color: beige;
+}
+</style>
