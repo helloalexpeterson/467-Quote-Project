@@ -17,3 +17,13 @@ h2 {
 .update {
     text-align: right;
 }
+.noItem {
+    text-align: center;
+    width: 150px;
+    border: 1px solid;
+    margin-bottom: 20px;
+}
+.errorMsg {
+    font-size:xx-large;
+    color: red;
+}
