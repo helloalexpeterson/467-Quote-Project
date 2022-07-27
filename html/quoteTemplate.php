@@ -239,12 +239,12 @@ try {
     
     $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
     $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
-    $count = 0;
+    $lineCount = 0;
     foreach ($lineItems as $row) {
-        $count++;
+        $lineCount++;
         // jump to element after action
         if (isset($_POST['lineID']))
-            if ($count == $_POST['lineID'])
+            if ($lineCount == $_POST['lineID'])
                 echo "<div id='editedLine'>";
         echo "<form action='#editedLine' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
@@ -256,7 +256,7 @@ try {
         echo "</form>";
     }
 
-    if ($count == 0) { echo "<div class='noItem'>No line items</div>"; }
+    if ($lineCount == 0) { echo "<div class='noItem'>No line items</div>"; }
 
     if (!$disableLines) {
         echo "<form id='addedLine' action='#addedLine' method='POST'>";
@@ -322,15 +322,20 @@ try {
 
     //Finalize quote/Sanction Quote/Order quote button
     if($quote['OrderStatus'] !== 'ordered'){ 
-    echo "<form action=\"\" method=\"POST\">";
-      
-        $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
+        $disableSubmit = '';
+        if ($lineCount <= 0 && $quote['OrderStatus'] != 'sanctioned') {
+            $disableSubmit = 'disabled';
+            $buttonMsg = 'At least one line item is required to ';
+        }
+        echo "<form action=\"\" method=\"POST\">";
+        
+            $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
 
-        echo "<input type=hidden name='quoteID' value={$quoteID}>";
-        echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
-        echo "<button type=submit name=submitBtn value='{$buttonText}' id=submitBtn>$buttonText</button>";
-        //echo "<script type='text/javascript'>alert('Username'".$username.");</script>";
-    echo "</form>";
+            echo "<input type=hidden name='quoteID' value={$quoteID}>";
+            echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
+            echo "<button type=submit name=submitBtn value='{$buttonText}' id=submitBtn $disableSubmit>$buttonText</button>";
+            //echo "<script type='text/javascript'>alert('Username'".$username.");</script>";
+        echo "</form>";
     }
    
 
