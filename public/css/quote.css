@@ -23,3 +23,7 @@ h2 {
     border: 1px solid;
     margin-bottom: 20px;
 }
+.errorMsg {
+    font-size:xx-large;
+    color: red;
+}

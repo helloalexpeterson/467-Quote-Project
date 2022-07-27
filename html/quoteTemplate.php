@@ -64,16 +64,15 @@ try {
     $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
     $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
     $quote = $result->fetch(PDO::FETCH_ASSOC);
+    $orderTotal = $quote['OrderTotal'];
 
     // custID from quote
     $customerID = $quote["CustomerID"];
     $result = $legacy->query("SELECT * FROM customers where id = $customerID");
-    $cust = $result->fetch(PDO::FETCH_ASSOC);  
-
+    $cust = $result->fetch(PDO::FETCH_ASSOC);
 
     // POST values
     $formAction = isset($_POST['formAction']) ? $_POST['formAction'] : '';
-    $orderTotal = $quote['OrderTotal'];
 
     // Legacy DB values
     $email = isset($_POST['Email']) ? $_POST['Email'] : $quote['Email'];
@@ -83,6 +82,7 @@ try {
     $contact = isset($cust['contact']) ? $cust['contact'] : "No contact found";
 
     //FORM FUNCTIONS
+    $errorMsg = '';
 
     switch($formAction){
         case 'email':
@@ -90,88 +90,87 @@ try {
             $prepared->execute([$email]);
             break;
         case 'editLine':
+            // update total and requery quote
             if (isset($_POST['lineID']) && isset($_POST['editDesc']) && is_numeric($_POST['editCost'])) {
                 $quote = editTotal($pdo, $quote, $quoteID, $_POST['lineID'], $_POST['editCost']);
+                $orderTotal = $quote['OrderTotal'];
                 $prepared = $pdo->prepare("UPDATE LineItems SET ServiceDesc=?, Cost=? WHERE LineID=? AND quoteID = $quoteID");
                 $prepared->execute([$_POST['editDesc'], $_POST['editCost'], $_POST['lineID']]);
             }
-            else {
-                echo "Error editing line item";
-            }
+            else { $errorMsg = "Error editing line item"; }
             break;
         case 'deleteLine':
+            // update total and requery quote
             if (isset($_POST['lineID'])) {
                 $prepared = $pdo->prepare("DELETE FROM LineItems WHERE LineID=? AND quoteID=$quoteID");
                 $prepared->execute([$_POST['lineID']]);
                 $quote = addToTotal($pdo, $quote, $quoteID, (-1 * $_POST['editCost']));
+                $orderTotal = $quote['OrderTotal'];
             }
-            else {
-                echo "Error deleting line";
-            }
+            else { $errorMsg = "Error deleting line"; }
             break;
         case 'addLine':
+            // update total and requery quote
             if (isset($_POST['addDesc']) && is_numeric($_POST['addCost'])) {
                 $prepared = $pdo->prepare("INSERT INTO LineItems SET ServiceDesc=?, Cost=?, quoteID=$quoteID");
                 $prepared->execute([$_POST['addDesc'], $_POST['addCost']]);
 
                 $quote = addToTotal($pdo, $quote, $quoteID, $_POST['addCost']);
+                $orderTotal = $quote['OrderTotal'];
             }
-            else {
-                echo "Error adding line";
-            }
+            else { $errorMsg = "Error adding line"; }
             break;
         case 'editNote':
             if (isset($_POST['noteID']) && isset($_POST['editNote'])) {
                 $prepared = $pdo->prepare("UPDATE Notes SET Note=? WHERE NoteID=? AND quoteID = $quoteID");
                 $prepared->execute([$_POST['editNote'], $_POST['noteID']]);
             }
-            else {
-                echo "Error editing secret note";
-            }
+            else { $errorMsg = "Error editing secret note"; }
             break;
         case 'deleteNote':
             if (isset($_POST['noteID'])) {
                 $prepared = $pdo->prepare("DELETE FROM Notes WHERE NoteID=? AND quoteID=$quoteID");
                 $prepared->execute([$_POST['noteID']]);
             }
-            else {
-                echo "Error deleting secret note";
-            }
+            else { $errorMsg = "Error deleting secret note"; }
             break;
         case 'addNote':
             if (isset($_POST['addNote'])) {
                 $prepared = $pdo->prepare("INSERT INTO Notes SET Note=?, quoteID=$quoteID");
                 $prepared->execute([$_POST['addNote']]);
             }
-            else {
-                echo "Error adding secret note";
-            }
+            else { $errorMsg = "Error adding secret note"; }
             break;
         case 'discountPercent':
+            // query line items
             $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
             $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
             $lineTotal=0;
+            // sum line item costs
             foreach($lineItems as $line){
                 $lineTotal= $lineTotal + ($line['Cost']); 
             }
+            // calc new total
             $orderTotal =   $lineTotal  - (0.01 * (float)$_POST['discount'] * $lineTotal);
             $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
             $prepared->execute([$orderTotal]);
-
+            // requery quote
             $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
             $quote = $result->fetch(PDO::FETCH_ASSOC);
             break;
         case 'discountAmount':
+            // query line items
             $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
             $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
             $lineTotal=0;
+            // sum line item costs
             foreach($lineItems as $line){
                 $lineTotal= $lineTotal + ($line['Cost']); 
             }
             $discount = (float)$_POST['discount'];
-            if ($discount > $lineTotal) {
-                // echo "Error: discount too large";
-            }
+            
+            if ($discount > $lineTotal) { $errorMsg = "Error: discount too large"; }
+            // requery quote
             else {
                 $orderTotal = $lineTotal - $discount;
                 $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
@@ -221,6 +220,7 @@ try {
         
     }
     echo <<< html
+        <div class='errorMsg'>$errorMsg</div>
         <h2>$CustomerName</h2>
 
         <div class=\"address\">$city<br>$street<br>$contact<br></div>
@@ -229,10 +229,9 @@ try {
     // Email
     echo "<form class=\"email\" action=\"\" method=\"POST\">";
         echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-        echo "<input type=\"hidden\" name=\"formAction\" value=\"email\">";
         echo "Email: ";
-        echo "<input type=\"email\" name=\"Email\" value=\"$email\" required";
-        echo "$disableEmail><button type=\"submit\" $disableEmail>Save email</button>";
+        echo "<input type=\"email\" name=\"Email\" value=\"$email\" required $disableEmail>";
+        echo "<button type=\"submit\" name=\"formAction\" value=\"email\" $disableEmail>Save email</button>";
     echo "</form>";
 
     // Line Items
@@ -240,16 +239,13 @@ try {
     
     $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
     $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
-    $lineTotalB = 0;
     $count = 0;
     foreach ($lineItems as $row) {
         $count++;
+        // jump to element after action
         if (isset($_POST['lineID']))
             if ($count == $_POST['lineID'])
                 echo "<div id='editedLine'>";
-        // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
-        // $ServiceDesc = $row["ServiceDesc"];
-        // $Cost = $row["Cost"];
         echo "<form action='#editedLine' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<input type=\"text\" name='editDesc' value=\"{$row["ServiceDesc"]}\" required $disableLines>";
@@ -258,27 +254,21 @@ try {
             echo "<button type=\"submit\" name='formAction' value='editLine' $disableLines>Edit</button>";
             echo "<button type=\"submit\" name='formAction' value='deleteLine' $disableLines>Delete</button><br>";
         echo "</form>";
-        // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
-        // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";  
     }
 
-    if ($count == 0) {
-        echo "<div class='noItem'>No line items</div>";
-    }
+    if ($count == 0) { echo "<div class='noItem'>No line items</div>"; }
 
     if (!$disableLines) {
         echo "<form id='addedLine' action='#addedLine' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<input type='text' name='addDesc' placeholder='Service Description' required $disableLines>";
             echo "<input type='number' name='addCost' placeholder='Service Cost' min='0' step='0.01' required $disableLines>";
-            echo "<input type='hidden' name='formAction' value='addLine'>";
-            echo "<button type='submit'$disableLines>Add Line Item</button >";
+            echo "<button type='submit'name='formAction' value='addLine' $disableLines>Add Line Item</button >";
         echo "</form >";
     }
 
     // Secret Notes
     echo "<h1>Secret Notes:</h1>";
-    // echo "query quote table";
 
     $result = $pdo->query("SELECT * FROM Notes where QuoteID = $quoteID");
     $secretNotes = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -286,10 +276,10 @@ try {
     $count = 0;
     foreach ($secretNotes as $row) {
         $count++;
+        // jump to element after action
         if (isset($_POST['noteID']))
             if ($count == $_POST['noteID'])
                 echo "<div id='editedNote'>";
-        // echo "<input type=\"text\" name=\"\" value=\"$row[\"ServiceDesc\"]\" disabled=\"disabled\">";
         echo "<form action='#editedNote' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<input type=\"text\" name='editNote' value=\"{$row['Note']}\" required $disableNotes>";
@@ -297,27 +287,21 @@ try {
             echo "<button type=\"submit\" name=\"formAction\" value=\"editNote\" $disableNotes>Edit</button>";
             echo "<button type=\"submit\" name=\"formAction\" value=\"deleteNote\"$disableNotes>Delete</button><br>";
          echo "</form>";
-        // echo "<input type=\"text\" value=\"$ServiceDesc\"] disabled=\"disabled\"><br>";
-        // echo "<input type=\"text\" name=\"\" value=\"$row[\"Cost\"]\" disabled=\"disabled\">";
     }
 
-    if ($count == 0) {
-        echo "<div class='noItem'>No secret notes</div>";
-    }
+    if ($count == 0) { echo "<div class='noItem'>No secret notes</div>"; }
 
     if (!$disableNotes) {
         echo "<form id='addedNote' action='#addedNote' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
             echo "<input type='text' name='addNote' placeholder='Note' required $disableNotes>";
-            echo "<input type='hidden' name='formAction' value='addNote' $disableNotes>";
-            echo "<button type='submit'$disableNotes>Add Secret Note</button>";
+            echo "<button type='submit' name='formAction' value='addNote' $disableNotes>Add Secret Note</button>";
         echo "</form>";
     }
 
     // Discount
         echo "<form id='discounted' class='discountPercent' action='#discounted' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-            // echo "<input type='hidden' name='formAction' value='discount'>";
             echo "<label>Discount %: </label>";
             echo "<input type='number' name='discount' placeholder='' min='0' max='100' required $disableDiscount >";
             echo "<button type='submit' name='formAction' value='discountPercent' required $disableDiscount >Apply</button><br>";
@@ -327,18 +311,12 @@ try {
             echo "<label>Discount Amount: </label>";
             echo "<input type='number' name='discount' placeholder='' min='0' max='{$quote['OrderTotal']}' step='0.01' required  $disableDiscount >";
             echo "<button type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
-            // echo "<input type='radio' name='formAction' value='discountPercent' checked>percent";
-            // echo "<input type='radio' name='formAction' value='discountAmount'>amount";
-            //$orderTotal = number_format($quote['OrderTotal'],2);
             if(isset($lineTotal)){
-            $discountTotal = $lineTotal - $orderTotal;
-            $discountTotal = round($discountTotal, $precision = 2);
-            echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
+                $discountTotal = $lineTotal - $orderTotal;
+                $discountTotal = round($discountTotal, $precision = 2);
+                echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
             }
-            echo "current quote total " . $quote['OrderTotal'] . "<br>";
-            $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
-            $quote = $result->fetch(PDO::FETCH_ASSOC);
-            echo "query quote total " . $quote['OrderTotal'] . "<br>";
+            $orderTotal = round($orderTotal, $precision = 2);
             echo "<label>Amount: &dollar;{$orderTotal}</label>";
         echo "</form>";
 
