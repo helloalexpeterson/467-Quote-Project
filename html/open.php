@@ -6,6 +6,11 @@ session_start(['name' => 'quotes']);
   <head>
 <?php 
   include 'header.php'; 
+
+  if( isset($_SESSION['submitMsg'])){
+    echo "<script>alert('{$_SESSION['submitMsg']}');</script>";
+    unset($_SESSION['submitMsg']);
+  }
   
   switch($_SESSION['userType']){
     case 'Sales Associate':
@@ -113,9 +118,7 @@ $mydb = connectdb();
   
 <?php 
   
-
-  //if an associate is logged in link
-  if(isset($_SESSION['userType']) && $_SESSION['userType'] == 'Sales Associate' || $_POST['menuType'] == 'Open Quotes' ) 
+  if(isset($_SESSION['userType']) && $_SESSION['userType'] == 'Sales Associate' || isset($_POST['menuType']) && $_POST['menuType'] == 'Open Quotes' )
   { 
 
     $sql = "SELECT id, name FROM customers";
@@ -151,25 +154,15 @@ $mydb = connectdb();
     echo "<h3>List of $querytype quotes:</h3>";
     $db = connectdb();
     $dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal FROM Quotes WHERE OrderStatus = '$querytype';";
-
-    /* enable this feature if we want to only show quotes for logged in associate
-    if($_SESSION['userType'] === 'Sales Associate')
-    {
-      $userID = $_SESSION['userID'];
-      $dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal FROM Quotes WHERE OrderStatus = '$querytype' AND Quotes.EmployeeID = '$userID';";
-    } */
-
     $dresult = $db->query($dbsql);
     $dbrow = $dresult->fetchAll(PDO::FETCH_ASSOC);
-
-    // echo "<pre>"; echo "rows queried"; echo "<br>"; print_r($dbrow);    echo "</pre>";
-
+    if($dresult->rowCount() > 0){
         echo "<table border='1'>
         <tr>
         <th>QuoteID</th>
         <th>Name</th>
         <th>Order Total</th>
-        </tr>";
+        </tr>";}
     
         $quoteCount = 0;
         foreach($dbrow as $row){

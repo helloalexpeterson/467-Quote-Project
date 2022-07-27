@@ -7,10 +7,12 @@ include '../lib/func.php';
   //************move this to the top
   if(isset($_POST['submitBtn']) && isset($_POST['submitBtn'])){
     echo "***6***";
-    advanceQuoteStatus($_POST['quoteID'], $_POST['submitBtn']); //this is broken now
+    $msg = advanceQuoteStatus($_POST['QuoteID'], $_POST['submitBtn'], $_POST['Email'], $_POST['EmployeeID'], $_POST['OrderTotal']  ); 
     echo "***7***";
     unset($_POST['submitBtn']);
-    //header('location:open.php');
+    $_SESSION['submitMsg'] = $msg;
+    //****Make sure to uncomment this to send the user back to open.php!***
+    header('location:open.php');
 }    
 include 'header.php';
 
@@ -330,8 +332,12 @@ try {
         echo "<form action=\"\" method=\"POST\">";
         
             $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
-
+            $email = isset($_POST['Email']) ? $_POST['Email'] : $quote['Email'];
+            foreach($quote as $k => $v){
+            echo "<input type=hidden name='{$k}' value={$v}>";
+            }
             echo "<input type=hidden name='quoteID' value={$quoteID}>";
+            //echo "<input type=hidden name='email' value={$email}>";
             echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
             echo "<button type=submit name=submitBtn value='{$buttonText}' id=submitBtn $disableSubmit>$buttonText</button>";
             //echo "<script type='text/javascript'>alert('Username'".$username.");</script>";

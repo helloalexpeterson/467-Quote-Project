@@ -158,7 +158,7 @@ function login($user, $pass){
 
 }
 
-function advanceQuoteStatus($quoteID, $buttonText){
+function advanceQuoteStatus($quoteID, $buttonText, $email, $EmployeeID, $OrderTotal){
     echo "***1***";
     $pdo = connectdb();
     echo "***2***";
@@ -169,7 +169,7 @@ function advanceQuoteStatus($quoteID, $buttonText){
             if($prepared){ 
                 $prepared->execute();
             } 
-            //echo "<script>alert('Quote #$quoteID finalized and sent to Headquarters.');</script>";
+            return $msg = "Quote $quoteID finalized and sent to Headquarters.";
             echo "***3***";
             break;
 
@@ -179,7 +179,7 @@ function advanceQuoteStatus($quoteID, $buttonText){
             if($prepared){ 
                 $prepared->execute();
             } 
-           // echo "<script>alert('Quote #$quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to $email');</script>";
+            return $msg ="Quote $quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to $email";
            echo "***4***";
             break;
 
@@ -189,17 +189,99 @@ function advanceQuoteStatus($quoteID, $buttonText){
             if($prepared){ 
                 $prepared->execute();
             } 
-            //echo "<script>alert('Quote #$quoteID submitted for purchasing. A copy of this order has been sent to $email');</script>";
+
+            submitPO($quoteID, $EmployeeID);
+            return $msg = "Quote $quoteID submitted for purchasing. A copy of this order has been sent to $email";
             break;
             
           default:
           echo "advance quote status error";
         }
+}
 
-        
-        
-        //echo "<script>alert('Quote #$quoteID submitted.');</script>";
-        //  echo "<script type='text/javascript'>alert('Quote #'".$quoteID.");</script>";
+function submitPO($quoteID, $EmployeeID){
+    $pdo = connectdb();
+    $sql = "SELECT Quotes.OrderTotal, Quotes.CustomerName, Quotes.CustomerID, Quotes.QuoteID, Quotes.EmployeeID, Employees.EmpName FROM Quotes  JOIN Employees ON Quotes.EmployeeID = Employees.EmployeeID AND QuoteID = :quoteID";
+            $prepared = $pdo->prepare($sql);
+            if($prepared){ 
+                $prepared->execute([':quoteID' => $quoteID]);
+                $rows = $prepared->fetch(PDO::FETCH_ASSOC);
+                echo "<br>submit PO for customer {$rows['CustomerID']}. called and executed sql for emp {$rows['EmployeeID']} empname {$rows['EmpName']} and quote {$rows['QuoteID']}<br>";
+            } 
+           
+            
+    $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
+    $data = array(
+        'order' => $rows['QuoteID'], 
+        'associate' => $rows['EmployeeID'],
+        'custid' => $rows['CustomerID'], 
+        'amount' => $rows['OrderTotal']);
+            
+    $options = array(
+        'http' => array(
+            'header' => array('Content-type: application/json', 'Accept: application/json'),
+            'method'  => 'POST',
+            'content' => json_encode($data)
+        )
+    );
+    
+    $context  = stream_context_create($options);
+    $result = file_get_contents($url, false, $context);
+    $result = json_decode($result, true);
+    print_r($result);
+    
+    createPO($pdo, $result);
+}
 
+function createPO($pdo, $result){
+    $sql = 'INSERT INTO PurchaseOrders(QuoteID , EmployeeID , CustomerID , OrderTotal , CustomerName , CommissionTotal, OrderTime)
+    VALUES (:order, :associate, :custid, :amount, :name, :commission, :timeStamp)';
+    $statement = $pdo->prepare($sql);
+    if($statement){
+    $timeStamp = date('Y-m-d H:i', $result['timeStamp']/1000);
+        $statement->execute([
+        ':order' => $result['order'],    
+        ':associate' => $result['associate'],
+        ':custid' => $result['custid'],
+        ':amount'  => $result['amount'],
+        ':name' => $result['name'],
+        ':commission'  => $result['commission'],
+        ':timeStamp' => $timeStamp]);
+    }
+    echo "<br>****PO inserted into table!!****<br>";
+    
+    payCommission($pdo,$result['associate'], $result['amount'], $result['commission']);
+}
+
+function payCommission($pdo, $emp, $total, $commission){
+    echo "<br>****Begin pay commission****<br>";
+    $sql = 'SELECT CommissionTotal FROM Employees WHERE EmployeeID = :empID';
+    $statement = $pdo->prepare($sql);
+    if($statement){
+        $statement->execute([':empID' => $emp]);
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if($row){
+
+            $commission = str_replace('%', '', $commission);
+            $total = $total * ($commission/100.00);
+            echo "<br>the total commish to pay employee number {$emp} is: {$total}<br>";
+
+            $total =  $row['CommissionTotal'] + $total;
+
+            echo "<br>the employee number {$emp} has: {$total} commission<br> ";
+
+        } 
+
+    
+
+        $sql = 'UPDATE Employees SET CommissionTotal = ? WHERE EmployeeID = ?';
+        $statement = $pdo->prepare($sql);
+        if($statement){
+            $statement->bindValue(1, $total);
+            $statement->bindValue(2, $emp);
+            $statement->execute();
+        }
+    }
 }
 ?>
