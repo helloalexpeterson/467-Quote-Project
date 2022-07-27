@@ -24,19 +24,19 @@
         <td>manders@d.com</td>
         <td>Maria Anders</td>
         <td>Germany</td>
-        <td>2022-07-26</td>
+        <td>2022-07-25</td>
       </tr>
       <tr>
         <td>fchang@c.com</td>
         <td>Francisco Chang</td>
         <td>Mexico</td>
-        <td>2022-07-25</td>
+        <td>2022-07-24</td>
       </tr>
       <tr>
         <td>wwords@b.com</td>
         <td>William Wordsworth</td>
         <td>United Kingdom</td>
-        <td>2022-07-24</td>
+        <td>2022-07-26</td>
       </tr>
       <tr>
         <td>rschmidt@a.com</td>
@@ -48,7 +48,7 @@
         <td>fredflintstone@dinosaur.com</td>
         <td>Fred Flintstone</td>
         <td>United Arab Emirates</td>
-        <td>2022-07-22</td>
+        <td>2022-07-21</td>
         <td></td>>
       </tr>
       <tr>
@@ -68,23 +68,11 @@
     <div id = "test">No.</div>
 
     <script>
-      let alphComp = (row1, row2) => 
-      {
-        return ( row1.innerHTML.toLowerCase() > row2.innerHTML.toLowerCase() );
-      }
-
-      // let dateComp = (row1, row2) => {
-      //   r1 = row1.innerHTML;
-      //   r2 = row2.innerHTML;
-
-      //   return true; 
-      // }
 
       document.getElementById("nameHeader")
               .addEventListener("click", 
                 function(){
                     sortTable("lname");
-
                 });
 
       document.getElementById("emailHeader")
@@ -111,8 +99,8 @@
 
         // Set ColIndex and compFunc depending on Col Header
         var colIndex;
-        var compFunc = (x, y) => {
-                return (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase());
+        let compFunc = (x, y) => {
+                return (x.toLowerCase() > y.toLowerCase());
             };
 
         switch(colHeader){
@@ -126,10 +114,19 @@
             colIndex = 0;
             break;
           case "date":
-            compFunc = (x, y) => {
-                return (Number(x.innerHTML) > Number(y.innerHTML));
-            };
-            colIndex = 4;
+            // compFunc = (x, y) => {
+
+            //     const xsplit = x.split("-");
+            //     let d1 = xsplit[0] + xsplit[1] + xsplit[2];
+
+            //     let ysplit = y.split("-");
+            //     let d2 = ysplit[0] + ysplit[1] + ysplit[2];
+            //     return (Number(d1) > Number(d2));
+            // };
+
+            colIndex = 3;
+            break;
+            
           default:    // Error
             colIndex = -1;
         }
@@ -149,8 +146,8 @@
             shouldSwitch = false;
             /* Get the two elements you want to compare,
             one from current row and one from the next: */
-            var x = rows[1].getElementsByTagName("TD")[colIndex];
-            var y = rows[i + 1].getElementsByTagName("TD")[colIndex];
+            var x = rows[1].getElementsByTagName("TD")[colIndex].innerHTML;
+            var y = rows[i + 1].getElementsByTagName("TD")[colIndex].innerHTML;
 
             // Check if the two rows should switch place:
             if (compFunc(x, y)) {
