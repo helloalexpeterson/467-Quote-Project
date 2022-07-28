@@ -109,6 +109,13 @@
             break;
           case "lname":
             colIndex = 1;
+
+            var compFunc = (x, y) => {
+              const xnames = x.split(" ");
+              const ynames = y.split(" ");
+
+              return (xnames[xnames.length - 1].toLowerCase() > ynames[ynames.length - 1].toLowerCase());
+            };
             break;
           case "email":
             colIndex = 0;
@@ -129,7 +136,6 @@
         /* Make a loop that will continue until
         no switching has been done: */
 
-        alert(table.rows[1].getElementsByTagName("TD")[colIndex].innerHTML);
         while (switching) {
           // Start by saying: no switching is done:
           switching = false;
