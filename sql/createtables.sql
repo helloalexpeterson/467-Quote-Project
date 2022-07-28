@@ -37,7 +37,7 @@ CREATE TABLE Notes (
 CREATE TABLE LineItems (
     LineID INT PRIMARY KEY AUTO_INCREMENT,
     QuoteID INT,
-    Cost DECIMAL(7,2),
+    Cost DECIMAL(10,2),
     Quantity INT,
     ServiceDesc VARCHAR(64),
 
