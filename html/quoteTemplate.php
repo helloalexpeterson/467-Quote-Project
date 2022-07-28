@@ -17,16 +17,18 @@ include '../lib/func.php';
 include 'header.php';
 
 //debug print
-echo "ignore this - debug info"; 
-echo "<br>";
-echo "<pre>  'SESSION'";  
-print_r($_SESSION);   
-echo "</pre>" ;
+if($debug){
+    echo "ignore this - debug info"; 
+    echo "<br>";
+    echo "<pre>  'SESSION'";  
+    print_r($_SESSION);   
+    echo "</pre>" ;
 
-echo "<br>";
-echo "<pre>  'POST'";  
-print_r($_POST);   
-echo "</pre>" ;
+    echo "<br>";
+    echo "<pre>  'POST'";  
+    print_r($_POST);   
+    echo "</pre>" ;
+}
 
 ?>
 <!DOCTYPE html>
