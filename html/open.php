@@ -3,86 +3,81 @@ session_start(['name' => 'quotes']);
 $pagetitle = "Create a new quote";
 include 'header.php'; 
 
-  if( isset($_SESSION['submitMsg'])){
-    echo "<script>alert('{$_SESSION['submitMsg']}');</script>";
-    unset($_SESSION['submitMsg']);
-  }
-  
-  switch($_SESSION['userType']){
-    case 'Sales Associate':
-      $querytype="open";
-      $buttonText = "Edit Quote";
-      $headermsg =  "Create new quote for customer"; 
-      echo "<br> Query type is: $querytype<br>";
-      break;
+switch($_SESSION['userType']){
+  case 'Sales Associate':
+    $querytype="open";
+    $buttonText = "Edit Quote";
+    $headermsg =  "Create new quote for customer"; 
+    echo "<br> Query type is: $querytype<br>";
+    break;
 
-      case 'Headquarters':
-      $querytype="finalized";
-      $buttonText = "Sanction Quote";
-      $headermsg =  "Sanction finalized quotes"; 
-      if(isset($_POST['menuType']) && $_POST['menuType'] === 'Sanctioned Quotes'){
+    case 'Headquarters':
+    $querytype="finalized";
+    $buttonText = "Sanction Quote";
+    $headermsg =  "Sanction finalized quotes"; 
+    if(isset($_POST['menuType']) && $_POST['menuType'] === 'Sanctioned Quotes'){
+      $buttonText = "Order Quote";
+      $querytype="sanctioned";
+      $headermsg =  "Order sanctioned quotes";
+      echo "<br>Query type is: $querytype<br>";
+      break;
+    }
+    if(isset($_POST['menuType']) && $_POST['menuType'] === 'Ordered Quotes'){
+      $buttonText = "Review Quote";
+      $querytype="ordered";
+      $headermsg =  "Review quotes submitted for purchase";
+      echo "<br>Query type is: $querytype<br>";
+      break;
+    }
+    echo "<br> Query type is: $querytype<br>";
+    break;
+    // probably shoulda used if statements or a different variable to deal with superusers priveleges 
+    case 'Superuser':
+      if ($_POST['menuType'] == 'Open Quotes'){
+        $querytype="open";
+        $buttonText = "Edit Quote";
+        $headermsg =  "Create new quote for customer"; 
+      }
+      else if ($_POST['menuType'] == 'Finalized Quotes'){
+        $querytype="finalized";
+        $buttonText = "Sanction Quote";
+        $headermsg =  "Sanction finalized quotes"; 
+      }
+      else if ($_POST['menuType'] == 'Sanctioned Quotes'){
         $buttonText = "Order Quote";
         $querytype="sanctioned";
         $headermsg =  "Order sanctioned quotes";
-        echo "<br>Query type is: $querytype<br>";
-        break;
       }
-      if(isset($_POST['menuType']) && $_POST['menuType'] === 'Ordered Quotes'){
+      else if ($_POST['menuType'] == 'Ordered Quotes'){
         $buttonText = "Review Quote";
         $querytype="ordered";
         $headermsg =  "Review quotes submitted for purchase";
-        echo "<br>Query type is: $querytype<br>";
-        break;
       }
       echo "<br> Query type is: $querytype<br>";
       break;
-      // probably shoulda used if statements or a different variable to deal with superusers priveleges 
-      case 'Superuser':
-        if ($_POST['menuType'] == 'Open Quotes'){
-          $querytype="open";
-          $buttonText = "Edit Quote";
-          $headermsg =  "Create new quote for customer"; 
-        }
-        else if ($_POST['menuType'] == 'Finalized Quotes'){
-          $querytype="finalized";
-          $buttonText = "Sanction Quote";
-          $headermsg =  "Sanction finalized quotes"; 
-        }
-        else if ($_POST['menuType'] == 'Sanctioned Quotes'){
-          $buttonText = "Order Quote";
-          $querytype="sanctioned";
-          $headermsg =  "Order sanctioned quotes";
-        }
-        else if ($_POST['menuType'] == 'Ordered Quotes'){
-          $buttonText = "Review Quote";
-          $querytype="ordered";
-          $headermsg =  "Review quotes submitted for purchase";
-        }
-        echo "<br> Query type is: $querytype<br>";
-        break;
-      default:
-      echo "You do not have permission to view this page. Please login as the appropriate user.";
-       
-     echo <<<HTML
-    <form action='login.php' method='POST'> <input type='submit' name='fail' value='Return to login'></form>
-    HTML;
-      exit();
+    default:
+    echo "You do not have permission to view this page. Please login as the appropriate user.";
+      
+    echo <<<HTML
+  <form action='login.php' method='POST'> <input type='submit' name='fail' value='Return to login'></form>
+  HTML;
+    exit();
 
-  }
+}
+
+// if(isset($_SESSION['userType']) && $_SESSION['userType'] === 'Sales Associate') 
+//{echo "<h2></h2>"; }
+
+?>
+<h2> <?php echo "$headermsg"; ?> </h2> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Customer</title>
+  <meta name="description" content="description"/>
+  <meta name="author" content="author" />
+  <meta name="keywords" content="keywords" />
+  <link rel="stylesheet" href="./stylesheet.css" type="text/css" />
+  <style type="text/css">.body { width: auto; }</style>
   
-  if(isset($_SESSION['userType']) && $_SESSION['userType'] === 'Sales Associate') 
-  {echo "<h2></h2>"; }
-  
-  ?>
-  <h2> <?php echo "$headermsg"; ?> </h2> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Select Customer</title>
-    <meta name="description" content="description"/>
-    <meta name="author" content="author" />
-    <meta name="keywords" content="keywords" />
-    <link rel="stylesheet" href="./stylesheet.css" type="text/css" />
-    <style type="text/css">.body { width: auto; }</style>
-    
 <?php
 include '../lib/func.php';
 include '../lib/db.php';
@@ -148,37 +143,5 @@ $mydb = connectdb();
   }
   
 ?>
-
-<?php 
-    echo "<h3>List of $querytype quotes:</h3>";
-    $db = connectdb();
-    $dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal FROM Quotes WHERE OrderStatus = '$querytype';";
-    $dresult = $db->query($dbsql);
-    $dbrow = $dresult->fetchAll(PDO::FETCH_ASSOC);
-    if($dresult->rowCount() > 0){
-        echo "<table border='1'>
-        <tr>
-        <th>QuoteID</th>
-        <th>Name</th>
-        <th>Order Total</th>
-        </tr>";}
-    
-        $quoteCount = 0;
-        foreach($dbrow as $row){
-          $quoteCount++;
-        echo "<tr>";
-        echo "<td> {$row['QuoteID'] } </td>" ; 
-        echo "<td> {$row['CustomerName'] } </td>" ; 
-        echo "<td> {$row['OrderTotal'] } </td>" ; 
-        echo "<td><form action=\"quoteTemplate.php\" method=\"POST\">";
-             echo "<input type=\"hidden\" name=\"quoteID\" value=\"{$row['QuoteID']}\"/>";
-             echo "<button type=\"submit\">$buttonText</button> ";
-         echo "</form></td>";
-
-        echo "</tr>";
-    }
-    echo "</table>";
-    echo "<b>$quoteCount quotes found</b>";
-    ?>
   </body>
 </html>
