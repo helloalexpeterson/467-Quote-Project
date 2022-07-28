@@ -194,7 +194,13 @@ function advanceQuoteStatus($quoteID, $buttonText){
                     if($prepared){ 
                         $prepared->execute();
                     } 
-                $msg = "Quote $quoteID submitted for purchasing. A copy of this order has been sent to {$quote['Email']}";
+                    $percent = str_replace('%', '', $result['commission']);
+                    $pay = $result['amount'] * ($percent/100.00);    
+                $msg = "Quote $quoteID submitted for purchasing.<br> 
+                A copy of this order has been sent to {$quote['Email']} <br> 
+                The total for this order is &#36;{$result['amount']} <br>
+                The commission rate for this order is {$result['commission']} <br> 
+                The total commission paid to the associate is &#36;{$pay}";
             } else {   
                 $msg = "Error with submitting purchase order to processor: $result";
             }
