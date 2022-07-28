@@ -307,11 +307,16 @@ try {
             echo "<label>Discount Amount: </label>";
             echo "<input type='number' name='discount' placeholder='' min='0' max='{$quote['OrderTotal']}' step='0.01' required  $disableDiscount >";
             echo "<button type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
-            if(isset($lineTotal)){
-                $discountTotal = $lineTotal - $orderTotal;
-                $discountTotal = round($discountTotal, $precision = 2);
-                echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
+
+            $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
+            $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
+            $lineTotal=0;
+            foreach($lineItems as $line){
+                $lineTotal= $lineTotal + ($line['Cost']); 
             }
+            $discountTotal = $lineTotal - $orderTotal;
+            $discountTotal = round($discountTotal, $precision = 2);
+            echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
             $orderTotal = round($orderTotal, $precision = 2);
             echo "<label>Amount: &dollar;{$orderTotal}</label>";
         echo "</form>";
