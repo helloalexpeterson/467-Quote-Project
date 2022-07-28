@@ -7,7 +7,7 @@ include '../lib/func.php';
 $msg = ''; 
 if(isset($_POST['submitBtn']) && isset($_POST['submitBtn'])){
 
-    $msg = advanceQuoteStatus($_GET['quoteID'], $_POST['submitBtn'], $_POST['Email'], $_POST['EmployeeID'], $_POST['OrderTotal']  ); 
+    $msg = advanceQuoteStatus($_GET['quoteID'], $_POST['submitBtn'] ); 
     unset($_POST['submitBtn']);
 }    
 $pagetitle="View Quote";
@@ -327,9 +327,9 @@ try {
         
             $quoteID = isset($_GET['quoteID']) ? $_GET['quoteID']: $quoteID;
             $email = isset($_POST['Email']) ? $_POST['Email'] : $quote['Email'];
-            foreach($quote as $k => $v){
-            echo "<input type=hidden name='{$k}' value={$v}>";
-            }
+            //foreach($quote as $k => $v){
+           // echo "<input type=hidden name='{$k}' value={$v}>";
+           // }
             echo "<input type=hidden name='quoteID' value={$quoteID}>";
             //echo "<input type=hidden name='email' value={$email}>";
             if($_SESSION['userType']=='Sales Associate' && $quote['OrderStatus'] == "open"){

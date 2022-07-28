@@ -25,7 +25,8 @@ if(isset($_POST['action'])){
  
     login($_POST['user'],$_POST['pass'] );
 
-  }}
+  }
+}
 
 ?>
     <center> 

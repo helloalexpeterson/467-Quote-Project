@@ -4,7 +4,7 @@ function createQuote($pdo, $id, $name, $city, $street, $contact, $email)
 {   
     //setting empid and status to be default while I figure out how to use employeeID with session variables
     $status = "open";
-    $empid = "1";
+    $empid = $_SESSION['userID'];
     $sql ='INSERT INTO Quotes (CustomerID, CustomerName, City, Street, Contact, Email, EmployeeID, OrderStatus) 
     VALUES (:CustomerID,:CustomerName,:City,:Street, :Contact,:Email,:EmployeeID,:OrderStatus )';
     $result = false;    
@@ -157,10 +157,17 @@ function login($user, $pass){
 
 }
 
-function advanceQuoteStatus($quoteID, $buttonText, $email, $EmployeeID, $OrderTotal){
+function advanceQuoteStatus($quoteID, $buttonText){
     
     $pdo = connectdb();
+    $sql = "SELECT * FROM Quotes WHERE QuoteID = ?";
+    $prepared = $pdo->prepare($sql);
+    if($prepared){ 
+        $prepared->execute([$quoteID]);
+        $quote = $prepared->fetch(PDO::FETCH_ASSOC);
+    } 
     switch($buttonText){
+
         case 'Finalize Quote':
             $sql = "UPDATE Quotes SET OrderStatus = 'finalized' WHERE QuoteID = $quoteID";
             $prepared = $pdo->prepare($sql);
@@ -176,18 +183,18 @@ function advanceQuoteStatus($quoteID, $buttonText, $email, $EmployeeID, $OrderTo
             if($prepared){ 
                 $prepared->execute();
             } 
-            return $msg ="Quote $quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to $email";
+            return $msg ="Quote $quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to {$quote['Email']}";
             break;
 
         case 'Order Quote':     
             $result = '';     
-            if(submitPO($quoteID, $EmployeeID, $result)){
+            if(submitPO($quoteID, $quote['EmployeeID'], $result)){
                 $sql = "UPDATE Quotes SET OrderStatus = 'ordered' WHERE QuoteID = $quoteID";
                 $prepared = $pdo->prepare($sql);
                     if($prepared){ 
                         $prepared->execute();
                     } 
-                $msg = "Quote $quoteID submitted for purchasing. A copy of this order has been sent to $email";
+                $msg = "Quote $quoteID submitted for purchasing. A copy of this order has been sent to {$quote['Email']}";
             } else {   
                 $msg = "Error with submitting purchase order to processor: $result";
             }
@@ -257,32 +264,33 @@ function createPO($pdo, $result){
 
 function payCommission($pdo, $emp, $total, $commission){
     global $debug;
-    if($debug){echo "<br>****Begin pay commission****<br>";}
-    $sql = 'SELECT CommissionTotal FROM Employees WHERE EmployeeID = :empID';
-    $statement = $pdo->prepare($sql);
-    if($statement){
-        $statement->execute([':empID' => $emp]);
-        $row = $statement->fetch(PDO::FETCH_ASSOC);
 
-        if($row){
+    if($debug){echo "<br>****Begin pay commission****<br>";}
+    //$sql = 'SELECT CommissionTotal FROM Employees WHERE EmployeeID = :empID';
+    //$statement = $pdo->prepare($sql);
+    //if($statement){
+        //$statement->execute([':empID' => $emp]);
+        //$row = $statement->fetch(PDO::FETCH_ASSOC);
+
+        //if($row){
 
             $commission = str_replace('%', '', $commission);
             $total = $total * ($commission/100.00);
             if($debug){echo "<br>the total commish to pay employee number {$emp} is: {$total}<br>";}
 
-            $total =  $row['CommissionTotal'] + $total;
+            //$total =  $row['CommissionTotal'] + $total;
 
             if($debug){echo "<br>the employee number {$emp} has: {$total} commission<br> ";}
 
-        }
+       // }
 
-        $sql = 'UPDATE Employees SET CommissionTotal = ? WHERE EmployeeID = ?';
+        $sql = 'UPDATE Employees SET CommissionTotal = CommissionTotal+? WHERE EmployeeID = ?';
         $statement = $pdo->prepare($sql);
         if($statement){
             $statement->bindValue(1, $total);
             $statement->bindValue(2, $emp);
             $statement->execute();
         }
-    }
+    //}
 }
 ?>
