@@ -201,6 +201,13 @@ function advanceQuoteStatus($quoteID, $buttonText){
                 The total for this order is &#36;{$result['amount']} <br>
                 The commission rate for this order is {$result['commission']} <br> 
                 The total commission paid to the associate is &#36;{$pay}";
+
+                $sql = "UPDATE Quotes SET CommissionRate = ? WHERE QuoteID = $quoteID";
+                $prepared = $pdo->prepare($sql);
+                    if($prepared){ 
+                        $prepared->execute([$percent]);
+                    }     
+
             } else {   
                 $msg = "Error with submitting purchase order to processor: $result";
             }
@@ -249,8 +256,9 @@ function submitPO($quoteID, $EmployeeID, &$result){
 
 function createPO($pdo, $result){
     global $debug;
-    $sql = 'INSERT INTO PurchaseOrders(QuoteID , EmployeeID , CustomerID , OrderTotal , CustomerName , CommissionTotal, OrderTime)
+    $sql = 'INSERT INTO PurchaseOrders(QuoteID , EmployeeID , CustomerID , OrderTotal , CustomerName , CommissionRate, OrderTime)
     VALUES (:order, :associate, :custid, :amount, :name, :commission, :timeStamp)';
+    $percent = str_replace('%', '', $result['commission']);
     $statement = $pdo->prepare($sql);
     if($statement){
     $timeStamp = date('Y-m-d H:i', $result['timeStamp']/1000);
@@ -260,7 +268,7 @@ function createPO($pdo, $result){
         ':custid' => $result['custid'],
         ':amount'  => $result['amount'],
         ':name' => $result['name'],
-        ':commission'  => $result['commission'],
+        ':commission'  => $percent,
         ':timeStamp' => $timeStamp]);
     }
     if($debug){echo "<br>****PO inserted into table!!****<br>";}
