@@ -52,7 +52,7 @@ CREATE TABLE PurchaseOrders(
     OrderTotal DECIMAL(10, 2) NOT NULL,
     CustomerName VARCHAR(32),
     ProcessDate DATE NOT NULL DEFAULT CURRENT_DATE(),
-    CommissionTotal VARCHAR(3) NOT NULL,
+    CommissionRate VARCHAR(3) NOT NULL,
     OrderTime TIMESTAMP NOT NULL,
 
     PRIMARY KEY (PurchaseID),
