@@ -1,4 +1,5 @@
 <?php
+include '../config/secrets.php';
 function createQuote($pdo, $id, $name, $city, $street, $contact, $email)
 {   
     //setting empid and status to be default while I figure out how to use employeeID with session variables
@@ -106,6 +107,7 @@ function updatePassword($pdo, $empID, $pass){
 }
 
 function login($user, $pass){
+    global $debug;
     $pdo = connectdb();
     $sql ='SELECT * FROM Employees WHERE :user = EmpName';  
     try {
@@ -119,10 +121,11 @@ function login($user, $pass){
         }
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
-        //echo "<br>statement is: "; print_r($statement);     echo "<br>";
-        echo "<br>result is: "; print_r($row);     echo "<br>";
-        echo "<br>pw hash is: "; print_r($row['PwHash']);     echo "<br>";
-        echo "<br>pw text is: "; print_r($row['PwText']);     echo "<br>";
+        if($debug){
+            echo "<br>result is: "; print_r($row);     echo "<br>";
+            echo "<br>pw hash is: "; print_r($row['PwHash']);     echo "<br>";
+            echo "<br>pw text is: "; print_r($row['PwText']);     echo "<br>";
+        }
 
     }
  
@@ -138,19 +141,15 @@ function login($user, $pass){
         $_SESSION["username"] = $row['EmpName'];
         switch( $row['Title'] ){
             case 'Sales Associate':    
-            header("Location: open.php");
+            header("Location: open.php?type=open", 303);
             break;
 
             case 'Headquarters':
-            header("Location: open.php");
+            header("Location: quotes.php?type=finalized", 303);
             break;
 
             case 'Administrator':
-            header("Location: admin.php");
-            break;
-
-            case 'Superuser':
-            header("Location: admin.php");
+            header("Location: admin.php", 303);
             break;
 
         } 
@@ -159,9 +158,8 @@ function login($user, $pass){
 }
 
 function advanceQuoteStatus($quoteID, $buttonText, $email, $EmployeeID, $OrderTotal){
-    echo "***1***";
+    
     $pdo = connectdb();
-    echo "***2***";
     switch($buttonText){
         case 'Finalize Quote':
             $sql = "UPDATE Quotes SET OrderStatus = 'finalized' WHERE QuoteID = $quoteID";
@@ -170,7 +168,6 @@ function advanceQuoteStatus($quoteID, $buttonText, $email, $EmployeeID, $OrderTo
                 $prepared->execute();
             } 
             return $msg = "Quote $quoteID finalized and sent to Headquarters.";
-            echo "***3***";
             break;
 
         case 'Sanction Quote':
@@ -180,18 +177,21 @@ function advanceQuoteStatus($quoteID, $buttonText, $email, $EmployeeID, $OrderTo
                 $prepared->execute();
             } 
             return $msg ="Quote $quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to $email";
-           echo "***4***";
             break;
 
-        case 'Order Quote':          
-            $sql = "UPDATE Quotes SET OrderStatus = 'ordered' WHERE QuoteID = $quoteID";
-            $prepared = $pdo->prepare($sql);
-            if($prepared){ 
-                $prepared->execute();
-            } 
-
-            submitPO($quoteID, $EmployeeID);
-            return $msg = "Quote $quoteID submitted for purchasing. A copy of this order has been sent to $email";
+        case 'Order Quote':     
+            $result = '';     
+            if(submitPO($quoteID, $EmployeeID, $result)){
+                $sql = "UPDATE Quotes SET OrderStatus = 'ordered' WHERE QuoteID = $quoteID";
+                $prepared = $pdo->prepare($sql);
+                    if($prepared){ 
+                        $prepared->execute();
+                    } 
+                $msg = "Quote $quoteID submitted for purchasing. A copy of this order has been sent to $email";
+            } else {   
+                $msg = "Error with submitting purchase order to processor: $result";
+            }
+            return $msg; 
             break;
             
           default:
@@ -199,17 +199,15 @@ function advanceQuoteStatus($quoteID, $buttonText, $email, $EmployeeID, $OrderTo
         }
 }
 
-function submitPO($quoteID, $EmployeeID){
+function submitPO($quoteID, $EmployeeID, &$result){
     $pdo = connectdb();
     $sql = "SELECT Quotes.OrderTotal, Quotes.CustomerName, Quotes.CustomerID, Quotes.QuoteID, Quotes.EmployeeID, Employees.EmpName FROM Quotes  JOIN Employees ON Quotes.EmployeeID = Employees.EmployeeID AND QuoteID = :quoteID";
             $prepared = $pdo->prepare($sql);
             if($prepared){ 
                 $prepared->execute([':quoteID' => $quoteID]);
                 $rows = $prepared->fetch(PDO::FETCH_ASSOC);
-                echo "<br>submit PO for customer {$rows['CustomerID']}. called and executed sql for emp {$rows['EmployeeID']} empname {$rows['EmpName']} and quote {$rows['QuoteID']}<br>";
             } 
-           
-            
+
     $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
     $data = array(
         'order' => $rows['QuoteID'], 
@@ -228,12 +226,16 @@ function submitPO($quoteID, $EmployeeID){
     $context  = stream_context_create($options);
     $result = file_get_contents($url, false, $context);
     $result = json_decode($result, true);
-    print_r($result);
-    
+    if(isset($result['errors'])){ 
+        $result = implode(',', $result['errors']);
+        return false;
+    }
     createPO($pdo, $result);
+    return true;
 }
 
 function createPO($pdo, $result){
+    global $debug;
     $sql = 'INSERT INTO PurchaseOrders(QuoteID , EmployeeID , CustomerID , OrderTotal , CustomerName , CommissionTotal, OrderTime)
     VALUES (:order, :associate, :custid, :amount, :name, :commission, :timeStamp)';
     $statement = $pdo->prepare($sql);
@@ -248,13 +250,14 @@ function createPO($pdo, $result){
         ':commission'  => $result['commission'],
         ':timeStamp' => $timeStamp]);
     }
-    echo "<br>****PO inserted into table!!****<br>";
+    if($debug){echo "<br>****PO inserted into table!!****<br>";}
     
     payCommission($pdo,$result['associate'], $result['amount'], $result['commission']);
 }
 
 function payCommission($pdo, $emp, $total, $commission){
-    echo "<br>****Begin pay commission****<br>";
+    global $debug;
+    if($debug){echo "<br>****Begin pay commission****<br>";}
     $sql = 'SELECT CommissionTotal FROM Employees WHERE EmployeeID = :empID';
     $statement = $pdo->prepare($sql);
     if($statement){
@@ -265,15 +268,13 @@ function payCommission($pdo, $emp, $total, $commission){
 
             $commission = str_replace('%', '', $commission);
             $total = $total * ($commission/100.00);
-            echo "<br>the total commish to pay employee number {$emp} is: {$total}<br>";
+            if($debug){echo "<br>the total commish to pay employee number {$emp} is: {$total}<br>";}
 
             $total =  $row['CommissionTotal'] + $total;
 
-            echo "<br>the employee number {$emp} has: {$total} commission<br> ";
+            if($debug){echo "<br>the employee number {$emp} has: {$total} commission<br> ";}
 
-        } 
-
-    
+        }
 
         $sql = 'UPDATE Employees SET CommissionTotal = ? WHERE EmployeeID = ?';
         $statement = $pdo->prepare($sql);
