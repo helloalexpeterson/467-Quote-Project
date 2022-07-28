@@ -1,11 +1,7 @@
 <?php  
 session_start(['name' => 'quotes']); 
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-<?php 
-  include 'header.php'; 
+$pagetitle = "Create a new quote";
+include 'header.php'; 
 
   if( isset($_SESSION['submitMsg'])){
     echo "<script>alert('{$_SESSION['submitMsg']}');</script>";

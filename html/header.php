@@ -1,83 +1,42 @@
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><?php if(isset($pagetitle)){  echo $pagetitle;  } else {  echo "Quotes";  } ?></title>
+    <meta charset="utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="../public/css/quote.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
 <?php 
-echo "<header>";
-echo "<th> Logged in as: {$_SESSION['username']} - {$_SESSION['userType']}</th>";
-
-
+echo "<b> Logged in as: {$_SESSION['username']} - {$_SESSION['userType']}</b>";
+echo "<ul class='navbar-nav me-auto mb-2 mb-lg-0'>";
 if($_SESSION['userType'] == 'Sales Associate'){
     echo<<<HTML
-       <div class="wrapper">
-       <div class="nav">
-           <table>
-               <tr>
-                   <th>Plant Repair:</th>
-                   <th>Associate View - Create Quote</th>
-                   <th><form action='open.php' method='POST'> <input type='submit' name='menuType' value='Open Quotes'> </form></th>
-                   <th><form action='' method='POST'> <input type='submit' name='' value='My Account Information'> </form></th>
-                   <th><form action='login.php' method='POST'> <input type='submit' name='logout' value='Logout'> </form></th>
-               </tr>
-           </table>
-       </div>
+                <li class="nav-item"><a class="nav-link" href='quotes.php?type=open'>Open Quotes</a></li>
+                <li class="nav-item"><a class="nav-link" href='open.php'>Create New Quote</a></li>
+                <li class="nav-item"><a class="nav-link" href='#'>My Commissions</a></li>           
        HTML;
    } 
    if($_SESSION['userType'] == 'Headquarters'){
     echo<<<HTML
-       <div class="wrapper">
-       <div class="nav">
-           <table>
-               <tr>
-                   <th>Plant Repair:</th>
-                   <th>HQ View - Sanction and Order Quote</th>
-                   <th><form action='open.php' method='POST'> <input type='submit' name='menuType' value='Finalized Quotes'> </form></th>
-                   <th><form action='open.php' method='POST'> <input type='submit' name='menuType' value='Sanctioned Quotes'> </form></th>
-                   <th><form action='open.php' method='POST'> <input type='submit' name='menuType' value='Ordered Quotes'> </form></th>
-                   <th><form action='login.php' method='POST'> <input type='submit' name='logout' value='Logout'> </form></th>
-               </tr>
-           </table>
-       </div>
+                <li class="nav-item"><a class="nav-link" href='quotes.php?type=finalized'>Finalized Quotes</a></li>
+                <li class="nav-item"><a class="nav-link" href='quotes.php?type=sanctioned'>Sanctioned Quotes</a></li>
+                <li class="nav-item"><a class="nav-link" href='quotes.php?type=ordered'>Ordered Quotes</a></li>  
        HTML;
    } 
    if($_SESSION['userType'] == 'Administrator'){
     echo<<<HTML
-       <div class="wrapper">
-       <div class="nav">
-           <table>
-               <tr>
-                   <th>Plant Repair:</th>
-                   <th>Admin View - Manage Associates and Quote History</th>
-                   <th><form action='' method='POST'> <input type='submit' name='menuType' value='Quote Management'> </form></th>
-                   <th><form action='admin.php' method='POST'> <input type='submit' name='menuType' value='Associate Management'> </form></th>
-                   <th><form action='login.php' method='POST'> <input type='submit' name='logout' value='Logout'> </form></th>
-               </tr>
-           </table>
-       </div>
-       HTML;
-   } 
-   if($_SESSION['userType'] == 'Superuser'){
-    echo<<<HTML
-       <div class="wrapper">
-       <div class="nav">
-           <table>
-               <tr>
-                   <th>Plant Repair:</th>
-                   <th>Superuser View</th>
-                   <th><form action='open.php' method='POST'> <input type='submit' name='menuType' value='Open Quotes'> </form></th>
-                   <th><form action='' method='POST'> <input type='submit' name='' value='My Account Information'> </form></th>
-                   <th><form action='open.php' method='POST'> <input type='submit' name='menuType' value='Finalized Quotes'> </form></th>
-                   <th><form action='open.php' method='POST'> <input type='submit' name='menuType' value='Sanctioned Quotes'> </form></th>
-                   <th><form action='' method='POST'> <input type='submit' name='' value='Quote Management'> </form></th>
-                   <th><form action='admin.php' method='POST'> <input type='submit' name='menuType' value='Associate Management'> </form></th>
-                   <th><form action='login.php' method='POST'> <input type='submit' name='logout' value='Logout'> </form></th>
+                <li class="nav-item"><a class="nav-link" href='admin.php'>Associate Management</a></li>  
+                <li class="nav-item"><a class="nav-link" href='#'>Quote Management</a></li>  
+         HTML;
+   }
+?>  
+                <li class="nav-item"><a class="nav-link" href='logout.php'>Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <h1>Plant Repair:</h1>
 
-               </tr>
-           </table>
-       </div>
-       HTML;
-   } 
-echo "</header>";
-?>
-<style>
-header {
-  background-color: beige;
-}
-</style>
+    

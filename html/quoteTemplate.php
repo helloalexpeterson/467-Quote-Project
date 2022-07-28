@@ -14,6 +14,7 @@ include '../lib/func.php';
     //****Make sure to uncomment this to send the user back to open.php!***
     header('location:open.php');
 }    
+$pagetitle="View Quote";
 include 'header.php';
 
 //debug print

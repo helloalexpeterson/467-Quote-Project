@@ -5,8 +5,6 @@ session_start(['name' => 'quotes']);
 <?php
 include '../lib/func.php';
 include '../lib/db.php';
-//include '../lib/db.php';
-//session code here
 ?>
 <html>
   <head>
