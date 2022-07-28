@@ -141,19 +141,15 @@ function login($user, $pass){
         $_SESSION["username"] = $row['EmpName'];
         switch( $row['Title'] ){
             case 'Sales Associate':    
-            header("Location: open.php");
+            header("Location: open.php?type=open", 303);
             break;
 
             case 'Headquarters':
-            header("Location: open.php");
+            header("Location: quotes.php?type=finalized", 303);
             break;
 
             case 'Administrator':
-            header("Location: admin.php");
-            break;
-
-            case 'Superuser':
-            header("Location: admin.php");
+            header("Location: admin.php", 303);
             break;
 
         } 
@@ -181,18 +177,21 @@ function advanceQuoteStatus($quoteID, $buttonText, $email, $EmployeeID, $OrderTo
                 $prepared->execute();
             } 
             return $msg ="Quote $quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to $email";
-           echo "***4***";
             break;
 
-        case 'Order Quote':          
-            $sql = "UPDATE Quotes SET OrderStatus = 'ordered' WHERE QuoteID = $quoteID";
-            $prepared = $pdo->prepare($sql);
-            if($prepared){ 
-                $prepared->execute();
-            } 
-
-            submitPO($quoteID, $EmployeeID);
-            return $msg = "Quote $quoteID submitted for purchasing. A copy of this order has been sent to $email";
+        case 'Order Quote':     
+            $result = '';     
+            if(submitPO($quoteID, $EmployeeID, $result)){
+                $sql = "UPDATE Quotes SET OrderStatus = 'ordered' WHERE QuoteID = $quoteID";
+                $prepared = $pdo->prepare($sql);
+                    if($prepared){ 
+                        $prepared->execute();
+                    } 
+                $msg = "Quote $quoteID submitted for purchasing. A copy of this order has been sent to $email";
+            } else {   
+                $msg = "Error with submitting purchase order to processor: $result";
+            }
+            return $msg; 
             break;
             
           default:
@@ -200,17 +199,15 @@ function advanceQuoteStatus($quoteID, $buttonText, $email, $EmployeeID, $OrderTo
         }
 }
 
-function submitPO($quoteID, $EmployeeID){
+function submitPO($quoteID, $EmployeeID, &$result){
     $pdo = connectdb();
     $sql = "SELECT Quotes.OrderTotal, Quotes.CustomerName, Quotes.CustomerID, Quotes.QuoteID, Quotes.EmployeeID, Employees.EmpName FROM Quotes  JOIN Employees ON Quotes.EmployeeID = Employees.EmployeeID AND QuoteID = :quoteID";
             $prepared = $pdo->prepare($sql);
             if($prepared){ 
                 $prepared->execute([':quoteID' => $quoteID]);
                 $rows = $prepared->fetch(PDO::FETCH_ASSOC);
-                echo "<br>submit PO for customer {$rows['CustomerID']}. called and executed sql for emp {$rows['EmployeeID']} empname {$rows['EmpName']} and quote {$rows['QuoteID']}<br>";
             } 
-           
-            
+
     $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
     $data = array(
         'order' => $rows['QuoteID'], 
