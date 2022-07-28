@@ -13,7 +13,7 @@ CREATE TABLE Employees (
 CREATE TABLE Quotes (
 	QuoteID INT PRIMARY KEY AUTO_INCREMENT,
 	CustomerID INT NOT NULL,
-    CustomerName VARCHAR(32) NOT NULL,
+    CustomerName VARCHAR(64) NOT NULL,
     City VARCHAR(32) NOT NULL,
     Street VARCHAR(32) NOT NULL,
     Contact VARCHAR(32) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE Notes (
 CREATE TABLE LineItems (
     LineID INT PRIMARY KEY AUTO_INCREMENT,
     QuoteID INT,
-    Cost DECIMAL(7,2),
+    Cost DECIMAL(10,2),
     Quantity INT,
     ServiceDesc VARCHAR(64),
 
@@ -55,7 +55,7 @@ CREATE TABLE PurchaseOrders(
     OrderTotal DECIMAL(10, 2) NOT NULL,
     CustomerName VARCHAR(32),
     ProcessDate DATE NOT NULL DEFAULT CURRENT_DATE(),
-    CommissionTotal DECIMAL(8,2) NOT NULL,
+    CommissionRate VARCHAR(3) NOT NULL,
     OrderTime TIMESTAMP NOT NULL,
 
     PRIMARY KEY (PurchaseID),

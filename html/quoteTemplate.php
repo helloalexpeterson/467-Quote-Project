@@ -1,41 +1,32 @@
-<?php session_start(['name' => 'quotes']); ?>
-
 <?php 
+session_start(['name' => 'quotes']); 
+
 include '../lib/db.php';
 include '../lib/func.php';
 
-  //************move this to the top
-  if(isset($_POST['submitBtn']) && isset($_POST['submitBtn'])){
-    echo "***6***";
-    advanceQuoteStatus($_POST['quoteID'], $_POST['submitBtn']); //this is broken now
-    echo "***7***";
+$msg = ''; 
+if(isset($_POST['submitBtn']) && isset($_POST['submitBtn'])){
+
+    $msg = advanceQuoteStatus($_GET['quoteID'], $_POST['submitBtn'] ); 
     unset($_POST['submitBtn']);
-    //header('location:open.php');
 }    
+$pagetitle="View Quote";
 include 'header.php';
 
 //debug print
-echo "ignore this - debug info"; 
-echo "<br>";
-echo "<pre>  'SESSION'";  
-print_r($_SESSION);   
-echo "</pre>" ;
+if($debug){
+    echo "ignore this - debug info"; 
+    echo "<br>";
+    echo "<pre>  'SESSION'";  
+    print_r($_SESSION);   
+    echo "</pre>" ;
 
-echo "<br>";
-echo "<pre>  'POST'";  
-print_r($_POST);   
-echo "</pre>" ;
+    echo "<br>";
+    echo "<pre>  'POST'";  
+    print_r($_POST);   
+    echo "</pre>" ;
+}
 
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>View Quote</title>
-<meta charset="utf-8">
-<link rel="stylesheet" href="../public/css/quote.css">
-</head>
-<body>
-<?php
 error_reporting(E_ALL);
 try {
 
@@ -43,25 +34,20 @@ try {
     $legacy = connectlegacy();
    
     //if "Create New Quote is pushed"
-    if(!isset($_POST["quoteID"])){
+    if(!isset($_GET["quoteID"])){
     
         $id = $_POST['id']; 
         $sql = "SELECT * FROM customers WHERE id = $id";
         $result = $legacy->query($sql);
         $row = $result->fetch(PDO::FETCH_ASSOC);   
-
-        echo "Calling openQuote function";
         $quoteID = createQuote($pdo,  $_POST['id'], $row['name'], $row['city'], $row['street'], $row['contact'], $_POST['email']);
 
-        if($quoteID){ 
-            echo "<br>";
-            echo "Created a quote for {$row['name']}. <br> Quote number: {$quoteID}";
-            } else { echo "didn't create quote!";}
-        
+        header("Location: quoteTemplate.php?quoteID=$quoteID", 303);
+        die();
     }
 
     // quoteID from form, else use newly created one
-    $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
+    $quoteID = isset($_GET['quoteID']) ? $_GET['quoteID']: $quoteID;
     $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
     $quote = $result->fetch(PDO::FETCH_ASSOC);
     $orderTotal = $quote['OrderTotal'];
@@ -185,13 +171,15 @@ try {
     //END OF FORM FUNC
 
     //Switch to disable email, notes, lines, discounts fields based on order status
+
+
+  
     switch($quote['OrderStatus']){
         case 'open':
             $disableEmail = '';
             $disableLines = '';
             $disableNotes = '';
             $disableDiscount = '';
-            $buttonText = 'Finalize Quote';
             $buttonMsg = "To finalize this quote and submit it to processing in headquarters, click here: ";
             break;
         case 'finalized':
@@ -199,7 +187,6 @@ try {
             $disableLines = '';
             $disableNotes = '';
             $disableDiscount = '';
-            $buttonText = 'Sanction Quote';
             $buttonMsg = "To sanction this quote and email it to the customer, click here: ";
             break;
         case 'sanctioned':
@@ -207,7 +194,6 @@ try {
             $disableLines = 'disabled';
             $disableNotes = 'disabled';
             $disableDiscount = '';
-            $buttonText = 'Order Quote';
             $buttonMsg = "To convert this quote into an order and process it, click here: ";            
             break;
         case 'ordered': 
@@ -217,14 +203,24 @@ try {
             $disableDiscount = 'disabled';
             $buttonText = '';
             break;
-        
     }
-    echo <<< html
-        <div class='errorMsg'>$errorMsg</div>
-        <h2>$CustomerName</h2>
 
+    if($_SESSION['userType'] == "Sales Associate" && $quote['OrderStatus'] !== "open" ){
+        $disableEmail = 'disabled';
+        $disableLines = 'disabled';
+        $disableNotes = 'disabled';
+        $disableDiscount = 'disabled';
+        $buttonText = '';
+    }   
+ 
+    echo <<<HTML
+        <div class='errorMsg'>$errorMsg</div>
+        <h2>Quote $quoteID -  status: {$quote['OrderStatus']} </h2>
+        <!--- Print message confirming order -->  
+        <p>$msg</p>  
+        <h2>$CustomerName</h2>
         <div class=\"address\">$city<br>$street<br>$contact<br></div>
-    html;
+    HTML;
 
     // Email
     echo "<form class=\"email\" action=\"\" method=\"POST\">";
@@ -311,11 +307,16 @@ try {
             echo "<label>Discount Amount: </label>";
             echo "<input type='number' name='discount' placeholder='' min='0' max='{$quote['OrderTotal']}' step='0.01' required  $disableDiscount >";
             echo "<button type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
-            if(isset($lineTotal)){
-                $discountTotal = $lineTotal - $orderTotal;
-                $discountTotal = round($discountTotal, $precision = 2);
-                echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
+
+            $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
+            $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
+            $lineTotal=0;
+            foreach($lineItems as $line){
+                $lineTotal= $lineTotal + ($line['Cost']); 
             }
+            $discountTotal = $lineTotal - $orderTotal;
+            $discountTotal = round($discountTotal, $precision = 2);
+            echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
             $orderTotal = round($orderTotal, $precision = 2);
             echo "<label>Amount: &dollar;{$orderTotal}</label>";
         echo "</form>";
@@ -327,14 +328,28 @@ try {
             $disableSubmit = 'disabled';
             $buttonMsg = 'At least one line item is required to ';
         }
-        echo "<form action=\"\" method=\"POST\">";
+        echo "<form method=\"POST\">";
         
-            $quoteID = isset($_POST['quoteID']) ? $_POST['quoteID']: $quoteID;
-
+            $quoteID = isset($_GET['quoteID']) ? $_GET['quoteID']: $quoteID;
+            $email = isset($_POST['Email']) ? $_POST['Email'] : $quote['Email'];
+            //foreach($quote as $k => $v){
+           // echo "<input type=hidden name='{$k}' value={$v}>";
+           // }
             echo "<input type=hidden name='quoteID' value={$quoteID}>";
-            echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
-            echo "<button type=submit name=submitBtn value='{$buttonText}' id=submitBtn $disableSubmit>$buttonText</button>";
-            //echo "<script type='text/javascript'>alert('Username'".$username.");</script>";
+            //echo "<input type=hidden name='email' value={$email}>";
+            if($_SESSION['userType']=='Sales Associate' && $quote['OrderStatus'] == "open"){
+                echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
+                echo "<button type=submit name=submitBtn value='Finalize Quote' id=submitBtn $disableSubmit>Finalize Quote</button>";
+            }
+            if($_SESSION['userType']=='Headquarters' && $quote['OrderStatus'] == "finalized"){
+                echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
+                echo "<button type=submit name=submitBtn value='Sanction Quote' id=submitBtn $disableSubmit>Sanction Quote</button>";
+            }
+            if($_SESSION['userType']=='Headquarters' && $quote['OrderStatus'] == "sanctioned"){
+                echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
+                echo "<button type=submit name=submitBtn value='Order Quote' id=submitBtn $disableSubmit>Order Quote</button>";
+            }
+            
         echo "</form>";
     }
    
