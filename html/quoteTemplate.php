@@ -205,7 +205,7 @@ try {
             break;
     }
 
-    if($_SESSION['userType'] == "Sales Associate" && $quote['OrderStatus'] !== "open" ){
+    if($_SESSION['userType'] == "Sales Associate" && $quote['OrderStatus'] !== "open" || $_SESSION['userType'] == "Administrator" ){
         $disableEmail = 'disabled';
         $disableLines = 'disabled';
         $disableNotes = 'disabled';
