@@ -30,7 +30,7 @@ include '../lib/db.php';
                 <h2>Sales Associates</h2>
               
                 <div class="individualAssoc">
-                <table border='1'>
+                <table border='1' id='assocTable'>
                     <tr>
                     <th>ID</th>
                     <th>Name</th>
@@ -54,10 +54,18 @@ include '../lib/db.php';
                         echo "</form>";
                         echo "</tr>";
                     } 
-                   
                     ?>
                  </table>
                 </div>
+                <br>
+                <button id='idBtn' onclick="sortTable('number', 0, 'assocTable')">Sort By Employee ID</button>
+                <button id='fNameBtnn' onclick="sortTable('string', 1, 'assocTable')">Sort By First Name</button>
+                <button id='lnameBtn' onclick="sortTable('lname', 1, 'assocTable')">Sort By Last Name</button>
+                <button id='emailBtn' onclick="sortTable('string', 2, 'assocTable')">Sort By Email</button>
+                <button id='titleBtn' onclick="sortTable('string', 3, 'assocTable')">Sort By Title</button>
+                <button id='commissionBtn' onclick="sortTable('number', 4, 'assocTable')">Sort By Commission</button>
+
+                <script src="tablesort.js"></script>
               
             </div><br>
             <!--Print a form to add a new associate -->        

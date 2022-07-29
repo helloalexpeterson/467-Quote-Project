@@ -79,16 +79,17 @@ include '../lib/db.php';
 
 echo "<h3>List of {$_GET['type']} quotes:</h3>";
 $db = connectdb();
-$dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal FROM Quotes WHERE OrderStatus = ?;";
+$dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal, Quotes.DateOpened FROM Quotes WHERE OrderStatus = ?;";
 $statement = $db->prepare($dbsql);
 $dbresult = $statement->execute([$_GET['type']]);            
 $dbrow = $statement->fetchAll(PDO::FETCH_ASSOC);
 if($statement->rowCount() > 0){
-    echo "<table border='1'>
+    echo "<table border='1' id='quoteTable'>
     <tr>
     <th>QuoteID</th>
     <th>Name</th>
     <th>Order Total</th>
+    <th>Date Opened</th
     </tr>";}
 
     $quoteCount = 0;
@@ -98,11 +99,19 @@ if($statement->rowCount() > 0){
     echo "<td> {$row['QuoteID'] } </td>" ; 
     echo "<td> {$row['CustomerName'] } </td>" ; 
     echo "<td> {$row['OrderTotal'] } </td>" ; 
+    echo "<td> {$row['DateOpened'] } </td>";
     echo "<td><a href=\"quoteTemplate.php?quoteID={$row['QuoteID']}\" class='btn btn-primary'> $buttonText</a></td> ";
     echo "</tr>";
 }
 echo "</table>";
 echo "<b>$quoteCount quotes found</b>";
+echo 
+"<br>
+ <button id='idBtn' onclick=\"sortTable('number', 0, 'quoteTable')\">Sort By ID</button>
+ <button id='custBtn' onclick=\"sortTable('string', 1, 'quoteTable')\">Sort Alphabetically</button>
+ <button id='costBtn' onclick=\"sortTable('number', 2, 'quoteTable')\">Sort By Order Total</button>
+ <button id='dateBtn' onclick=\"sortTable('string', 3, 'quoteTable')\">Sort By Date Opened</button>";
 ?>
+  <script src="tablesort.js"></script>
   </body>
 </html>
