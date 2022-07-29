@@ -21,7 +21,7 @@ include '../lib/db.php';
 <body>
     <?php 
     $pdo = connectdb();
-    $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal FROM Employees";
+    $sql = "SELECT EmployeeID, Email, EmpName, City, Street, Title, CommissionTotal, PwHash FROM Employees";
     $result = $pdo->query($sql);
     $rows = $result->fetchAll(PDO::FETCH_ASSOC);
     ?>
@@ -34,9 +34,11 @@ include '../lib/db.php';
                     <tr>
                     <th>ID</th>
                     <th>Name</th>
+                    <th>Address</th>
                     <th>Email</th>
                     <th>Title</th>
                     <th>Commission total</th>
+                    <th>Hash Protected Password</th>
                     </tr>
                     
                     <?php foreach($rows as $employee ){
@@ -46,9 +48,16 @@ include '../lib/db.php';
                         echo "<td> {$employee['EmployeeID'] } </td>" ; 
                         echo "<input type='hidden' name='empID' value='{$employee['EmployeeID'] }'>";
                         echo "<td> {$employee['EmpName'] } </td>" ; 
+                        if (isset($employee['Street']) && isset($employee['City'])) {
+                            echo "<td> {$employee['Street'] }, {$employee['City'] } </td>" ; 
+                        }
+                        else {
+                            echo "<td> No full address on record </td>" ; 
+                        }
                         echo "<td> {$employee['Email'] } </td>" ; 
                         echo "<td> {$employee['Title'] } </td>" ;
                         echo "<td> {$employee['CommissionTotal'] } </td>" ;
+                        echo "<td> {$employee['PwHash'] } </td>" ;
                         echo "<td><button type='submit' name='editAssociate' value='editAssociate' id='editAssociate'>Edit</button></td>";
                         echo "<td><button type='submit' name='deleteAssociate' id='deleteAssociate'>Delete</button></td>";
                         echo "</form>";

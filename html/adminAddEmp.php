@@ -12,12 +12,14 @@ session_start(['name' => 'quotes']);
         $empName = $_POST['empName'];
         $title = $_POST['title'];
         $pwd = $_POST['pwd'];
+        $city = $_POST['city'];
+        $street = $_POST['street'];
         $hashed_pwd = password_hash($pwd, PASSWORD_DEFAULT);
     
 
         //insert data into db 
-        $sql = "INSERT INTO Employees (Email, EmpName, Title, PwHash) 
-                    VALUES ('$email', '$empName', '$title', '$hashed_pwd')";
+        $sql = "INSERT INTO Employees (Email, EmpName, City, Street, Title, PwHash) 
+                    VALUES ('$email', '$empName', '$city', '$steet', '$title', '$hashed_pwd')";
 
         $pdo->exec($sql);
 
@@ -58,6 +60,14 @@ session_start(['name' => 'quotes']);
                     $val=$_POST['title'];
                     updateTitle($pdo, $empID, $val);
                     break;
+                case 'Update city':
+                    $val=$_POST['empCity'];
+                    updateGiven($pdo, $empID, 'City', $val);
+                    break;
+                case 'Update street':
+                    $val=$_POST['empStreet'];
+                    updateGiven($pdo, $empID, 'Street', $val);
+                    break;
                 case 'Update password':
                     if(!$_POST['pwd']){
                         echo  "<br> Error: password field must be valid. <br>";
@@ -80,6 +90,12 @@ session_start(['name' => 'quotes']);
                     <label for="pwd">Password:</label>
                     <input type="password" id="pwd" name="pwd" placeholder="Associate password">
                     <input type="submit" name="action" value="Update password"><br>
+                    <label for="empName">City:</label>
+                    <input type="text" name="empCity" placeholder="Associate city">
+                    <input type="submit" name="action" value="Update city"><br>
+                    <label for="empName">Street:</label>
+                    <input type="text" name="empStreet" placeholder="Associate street">
+                    <input type="submit" name="action" value="Update street"><br>
                     <label for="email">E-mail:</label>
                     <input type="email" id="email" name="email" placeholder="Associate E-mail">
                     <input type="submit" name="action" value="Update email"><br><br>
@@ -111,4 +127,20 @@ session_start(['name' => 'quotes']);
 
     }
 
+function updateGiven($pdo, $empID, $columnName, $val) {
+    try {
+        $statement = $pdo->prepare("UPDATE Employees SET $columnName = :val WHERE EmployeeID = :empID ");
+        if($statement) {
+                $result = $statement->execute([
+                    ':val' => $val,
+                    ':empID' => $empID
+                ]);
+            }
+        }
+
+    catch (PDOException $e){
+    echo "    <p>Could not query from database. PDO Exception: {$e->getMessage()}</p>\n";
+
+    }
+}
 ?>

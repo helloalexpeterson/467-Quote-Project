@@ -4,6 +4,8 @@ CREATE TABLE Employees (
     EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
     Email VARCHAR(32) NOT NULL,
     EmpName VARCHAR(32) NOT NULL,
+    City VARCHAR(32),
+    Street VARCHAR(32),
     Title ENUM('Sales Associate', 'Headquarters', 'Administrator', 'Superuser'),
     PwHash VARCHAR(64) NOT NULL,
     PwText VARCHAR(64),
