@@ -1,23 +1,23 @@
-INSERT INTO Employees (Email, EmpName, Title, PwHash, PwText)
-VALUES ('z1912480@niu.edu', 'Alex Peterson', 'Sales Associate', '1234', '1234');
+INSERT INTO Employees (Email, EmpName, Title, PwHash, PwText, Street)
+VALUES ('z1912480@niu.edu', 'Alex Peterson', 'Sales Associate', '1234', '1234', '4701 Tator Patch Road');
 
-INSERT INTO Employees(Email, EmpName, Title, PwHash)
-VALUES ('bighead@aol.com', 'John Smith', 'Headquarters', '5678');
+INSERT INTO Employees(Email, EmpName, Title, PwHash, Street)
+VALUES ('bighead@aol.com', 'John Smith', 'Headquarters', '5678', '4466 North Avenue');
 
-INSERT INTO Employees(Email, EmpName, Title, PwHash)
-VALUES ('me@me.com', 'Jane Doe', 'Administrator', 'abcd');
+INSERT INTO Employees(Email, EmpName, Title, PwHash, Street)
+VALUES ('me@me.com', 'Jane Doe', 'Administrator', 'abcd', '4154 Sugar Camp Road');
 
-INSERT INTO Employees(Email, EmpName, Title, PwHash)
-VALUES ('megamind@gmail.com', 'Megamind', 'Superuser', 'efgh');
+INSERT INTO Employees(Email, EmpName, Title, PwHash, Street)
+VALUES ('megamind@gmail.com', 'Megamind', 'Superuser', 'efgh', '1228 University Drive');
 
-INSERT INTO Employees (Email, EmpName, Title, PwHash, PwText)
-VALUES ('z1912480@niu.edu', 'sales', 'Sales Associate', '$2y$10$AlFq6Ds2T8sUfknHb2MLu.gAxBg/6yNxpAUqtshqnIf/33.R76nQu ', '1234');
+INSERT INTO Employees (Email, EmpName, Title, PwHash, PwText, Street)
+VALUES ('z1912480@niu.edu', 'sales', 'Sales Associate', '$2y$10$AlFq6Ds2T8sUfknHb2MLu.gAxBg/6yNxpAUqtshqnIf/33.R76nQu ', '1234', '3182 Leisure Lane');
 
-INSERT INTO Employees (Email, EmpName, Title, PwHash, PwText)
-VALUES ('z1912480@niu.edu', 'hq', 'Headquarters', '$2y$10$M5sPpmx8ZCWULyhJIVrmnOTbIpTQDpEKKChSujzXHOW2X04CjDS6S', '1234');
+INSERT INTO Employees (Email, EmpName, Title, PwHash, PwText, Street)
+VALUES ('z1912480@niu.edu', 'hq', 'Headquarters', '$2y$10$M5sPpmx8ZCWULyhJIVrmnOTbIpTQDpEKKChSujzXHOW2X04CjDS6S', '1234', '3223 Lunetta Street');
 
-INSERT INTO Employees (Email, EmpName, Title, PwHash, PwText)
-VALUES ('z1912480@niu.edu', 'admin', 'Administrator', '$2y$10$wk5uu0XMwkT8WuoQsRdPr.afIrp5BM1I2hQ.UjiHyKnLxFT.B7QOy', '1234');
+INSERT INTO Employees (Email, EmpName, Title, PwHash, PwText, Street)
+VALUES ('z1912480@niu.edu', 'admin', 'Administrator', '$2y$10$wk5uu0XMwkT8WuoQsRdPr.afIrp5BM1I2hQ.UjiHyKnLxFT.B7QOy', '1234', '1516 Green Gate Lane');
 
 INSERT INTO Quotes (CustomerID, CustomerName, City, Street, Contact, Email, EmployeeID, OrderStatus, CommissionRate, OrderTotal, StartDate)
 VALUES ('1','IBM Corporation', 'Armonk, NY', 'The IBM Way', '1-800-CALL-IBM', 'ibm@ibm.ibm', '1', 'open', '5', '1000', '2022-05-07');

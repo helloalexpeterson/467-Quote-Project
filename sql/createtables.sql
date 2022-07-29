@@ -7,7 +7,8 @@ CREATE TABLE Employees (
     Title ENUM('Sales Associate', 'Headquarters', 'Administrator', 'Superuser'),
     PwHash VARCHAR(64) NOT NULL,
     PwText VARCHAR(64),
-    CommissionTotal DOUBLE(8,2) DEFAULT 0.00
+    CommissionTotal DOUBLE(10,2) DEFAULT 0.00,
+    Street VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE Quotes (
