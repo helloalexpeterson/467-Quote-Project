@@ -30,10 +30,7 @@ session_start(['name' => 'quotes']);
         $editAssociate = $_POST['editAssociate']; 
         $empID = $_POST['empID'];
         $val='';
-        echo "<pre>"; print_r($_POST); echo "</pre>";
-        echo "edit button pushed! <br>"; 
-        echo "emp ID is {$_POST['empID']} <br>";       
-
+     
         if(isset($_POST['action'])){
             //echo "an update button pushed, it was: ";
             //echo $_POST['action']; "<br>";     
@@ -65,24 +62,52 @@ session_start(['name' => 'quotes']);
                     }
                     updatePassword($pdo, $empID, $_POST['pwd']);
                     break;
+                case 'Update commission':
+                    if(!$_POST['commission']){
+                        echo  "<br> Error: commission field must be valid. <br>";
+                        break;
+                    }
+                    updateCommission($pdo, $empID, $_POST['commission']);
+                    break;
+                case 'Update mailing address':
+                    if(!$_POST['street']){
+                        echo  "<br> Error: address field must be valid. <br>";
+                        break;
+                    }
+                    updateAddress($pdo, $empID, $_POST['street']);
+                    break;
+    
 
 
             }
         }
         
+
+
+        $sql ="SELECT * FROM Employees WHERE EmployeeID = $empID";   
+        $result = $pdo->query($sql);
+        $row = $result->fetch(PDO::FETCH_ASSOC);
+
         echo <<<HTML
         <form method="POST" action="adminAddEmp.php"> 
                     <br>
                     <h3>Update User:</h3>
                     <label for="empName">Name:</label>
-                    <input type="text" id="empName" name="empName" placeholder="Associate name">
+                    <input type="text" id="empName" name="empName" placeholder="{$row['EmpName']}">
                     <input type="submit" name="action" value="Update name"><br>
+
                     <label for="pwd">Password:</label>
-                    <input type="password" id="pwd" name="pwd" placeholder="Associate password">
+                    <input type="password" id="pwd" name="pwd" placeholder="{$row['PwText']}">
                     <input type="submit" name="action" value="Update password"><br>
+
                     <label for="email">E-mail:</label>
-                    <input type="email" id="email" name="email" placeholder="Associate E-mail">
+                    <input type="email" id="email" name="email" placeholder="{$row['Email']}">
                     <input type="submit" name="action" value="Update email"><br><br>
+
+                    <label for="street">Address:</label>
+                    <input type="text" id="street" name="street" placeholder="{$row['Street']}">
+                    <input type="submit" name="action" value="Update mailing address"><br><br>
+
                     <label for="title">Title:</label>
                     <select id="title" name="title">
                         <option value="Sales Associate">Sales Associate</option>
@@ -90,6 +115,11 @@ session_start(['name' => 'quotes']);
                         <option value="Administrator">Administrator</option>
                     </select>
                     <input type="submit" name="action" value="Update title"><br>
+
+                    <label for="commission">Commission:</label>
+                    <input type="number" id="commission" name="commission" placeholder="{$row['CommissionTotal']}" min="0">
+                    <input type="submit" name="action" value="Update commission"><br><br>
+
         HTML;
                     echo "<input type='hidden' name='editAssociate' value='{$editAssociate}'><br>";
                     echo "<input type='hidden' name='empID' value='{$empID}'><br>";
@@ -108,7 +138,6 @@ session_start(['name' => 'quotes']);
         $prepared = $pdo->exec("DELETE FROM Employees WHERE EmployeeID = $empID ");
         //$prepared->execute();
         header("Location: admin.php");
-
     }
 
 ?>

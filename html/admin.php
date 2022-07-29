@@ -21,7 +21,7 @@ include '../lib/db.php';
 <body>
     <?php 
     $pdo = connectdb();
-    $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal FROM Employees";
+    $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal, Street FROM Employees";
     $result = $pdo->query($sql);
     $rows = $result->fetchAll(PDO::FETCH_ASSOC);
     ?>
@@ -33,8 +33,9 @@ include '../lib/db.php';
                 <table border='1'>
                     <tr>
                     <th>ID</th>
-                    <th>Name</th>
+                    <th>Username</th>
                     <th>Email</th>
+                    <th>Address</th>
                     <th>Title</th>
                     <th>Commission total</th>
                     </tr>
@@ -47,6 +48,7 @@ include '../lib/db.php';
                         echo "<input type='hidden' name='empID' value='{$employee['EmployeeID'] }'>";
                         echo "<td> {$employee['EmpName'] } </td>" ; 
                         echo "<td> {$employee['Email'] } </td>" ; 
+                        echo "<td> {$employee['Street'] } </td>" ; 
                         echo "<td> {$employee['Title'] } </td>" ;
                         echo "<td> {$employee['CommissionTotal'] } </td>" ;
                         echo "<td><button type='submit' name='editAssociate' value='editAssociate' id='editAssociate'>Edit</button></td>";
