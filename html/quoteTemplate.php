@@ -205,7 +205,7 @@ try {
             break;
     }
 
-    if($_SESSION['userType'] == "Sales Associate" && $quote['OrderStatus'] !== "open" ){
+    if(($_SESSION['userType'] == "Sales Associate") && $quote['OrderStatus'] !== "open" ){
         $disableEmail = 'disabled';
         $disableLines = 'disabled';
         $disableNotes = 'disabled';
@@ -337,15 +337,15 @@ try {
            // }
             echo "<input type=hidden name='quoteID' value={$quoteID}>";
             //echo "<input type=hidden name='email' value={$email}>";
-            if($_SESSION['userType']=='Sales Associate' && $quote['OrderStatus'] == "open"){
+            if(($_SESSION['userType'] == "Superuser" || $_SESSION['userType']=='Sales Associate') && $quote['OrderStatus'] == "open"){
                 echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
                 echo "<button type=submit name=submitBtn value='Finalize Quote' id=submitBtn $disableSubmit>Finalize Quote</button>";
             }
-            if($_SESSION['userType']=='Headquarters' && $quote['OrderStatus'] == "finalized"){
+            if(($_SESSION['userType'] == "Superuser" || $_SESSION['userType']=='Headquarters') && $quote['OrderStatus'] == "finalized"){
                 echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
                 echo "<button type=submit name=submitBtn value='Sanction Quote' id=submitBtn $disableSubmit>Sanction Quote</button>";
             }
-            if($_SESSION['userType']=='Headquarters' && $quote['OrderStatus'] == "sanctioned"){
+            if(($_SESSION['userType'] == "Superuser" ||$_SESSION['userType']=='Headquarters') && $quote['OrderStatus'] == "sanctioned"){
                 echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
                 echo "<button type=submit name=submitBtn value='Order Quote' id=submitBtn $disableSubmit>Order Quote</button>";
             }
