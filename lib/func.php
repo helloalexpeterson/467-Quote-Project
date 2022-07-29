@@ -184,6 +184,9 @@ function advanceQuoteStatus($quoteID, $buttonText){
             if($prepared){ 
                 $prepared->execute();
             } 
+            if(!sendCustomerEmail($pdo, $quoteID, $quote['Email'], 'quote')) {
+                echo "Email failed to send during sanctioning";
+            }
             return $msg ="Quote $quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to {$quote['Email']}";
             break;
 
@@ -212,6 +215,11 @@ function advanceQuoteStatus($quoteID, $buttonText){
             } else {   
                 $msg = "Error with submitting purchase order to processor: $result";
             }
+
+            if(!sendCustomerEmail($pdo, $quoteID, $quote['Email'], 'order')) {
+                echo "Email failed to send during order creation";
+            }
+
             return $msg; 
             break;
             
@@ -307,5 +315,59 @@ function payCommission($pdo, $emp, $total, $commission){
             $statement->execute();
         }
     //}
+}
+
+function sendCustomerEmail($pdo, $quoteID, $email, $type) {
+    include '../config/secrets.php';
+
+    $msg = "First line of text\nSecond line of text";
+    $pdo = connectdb();
+    switch($type) {
+        case 'quote':
+            $prepared = $pdo->prepare("SELECT * FROM Quotes WHERE QuoteID = ?");
+            $prepared->execute([$quoteID]);
+            $quote = $prepared->fetch(PDO::FETCH_ASSOC);
+
+            $msg = implode(" ", $quote);
+            break;
+        case 'order':
+            $prepared = $pdo->prepare("SELECT * FROM PurchaseOrders WHERE QuoteID = ?");
+            $prepared->execute([$quoteID]);
+            $order = $prepared->fetch(PDO::FETCH_ASSOC);
+
+            $msg = implode(" ", $order);
+            break;
+        default:
+            echo "No type given, no email sent.";
+    }
+
+    // use wordwrap() if lines are longer than 70 characters
+    $msg = wordwrap($msg,70);
+    // send email
+    if (true || in_array($email, $canReceiveEmails)) {
+        $subject = 'the subject';
+        $headers = array(
+            'From' => 'webmaster@example.com',
+            'Reply-To' => 'webmaster@example.com',
+            'X-Mailer' => 'PHP/' . phpversion()
+        );
+
+        $success = mail($email, $subject, $msg, $headers);
+        if ($debug) {
+            if ($success) {
+                echo "mail() does not guarentee that the email was send (read documentation)<br>";
+                echo "mail() Sucessful <br>";
+            }
+            else {
+                echo "mail() Failed ";
+            }
+            echo "Email: " . $email . "<br>Message: <blockquote>" . $msg . "</blockquote>";
+        }
+
+        return $success;
+    }
+    else if ($debug)
+        echo "Email not on config list";
+    return false;
 }
 ?>
