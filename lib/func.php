@@ -106,6 +106,42 @@ function updatePassword($pdo, $empID, $pass){
     }
 }
 
+function updateCommission($pdo, $empID, $commission){
+    $sql ='UPDATE Employees SET CommissionTotal = :comm WHERE EmployeeID = :empID ;';   
+    try {
+            $statement = $pdo->prepare($sql);
+            if($statement) {
+                    $result = $statement->execute([
+                        ':comm' => $commission,
+                        ':empID' => $empID
+                    ]);
+                }
+            }
+     
+     catch (PDOException $e){
+        echo "    <p>Could not query from database. PDO Exception: {$e->getMessage()}</p>\n";
+    }
+}
+
+
+function updateAddress($pdo, $empID, $street){
+    $sql ='UPDATE Employees SET Street = :street WHERE EmployeeID = :empID ;';   
+    try {
+            $statement = $pdo->prepare($sql);
+            if($statement) {
+                    $result = $statement->execute([
+                        ':street' => $street,
+                        ':empID' => $empID
+                    ]);
+                }
+            }
+     
+     catch (PDOException $e){
+        echo "    <p>Could not query from database. PDO Exception: {$e->getMessage()}</p>\n";
+    }
+
+}
+
 function login($user, $pass){
     global $debug;
     $pdo = connectdb();

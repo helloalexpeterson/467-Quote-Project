@@ -29,7 +29,7 @@ if($_SESSION['userType'] == 'Sales Associate' || $_SESSION['userType'] == 'Super
    if($_SESSION['userType'] == 'Administrator' || $_SESSION['userType'] == 'Superuser'){
     echo<<<HTML
                 <li class="nav-item"><a class="nav-link" href='admin.php'>Associate Management</a></li>  
-                <li class="nav-item"><a class="nav-link" href='#'>Quote Management</a></li>  
+                <li class="nav-item"><a class="nav-link" href='adminSort.php'>Quote Management</a></li>  
          HTML;
    }
 ?>  

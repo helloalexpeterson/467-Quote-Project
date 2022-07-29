@@ -21,7 +21,7 @@ include '../lib/db.php';
 <body>
     <?php 
     $pdo = connectdb();
-    $sql = "SELECT EmployeeID, Email, EmpName, City, Street, Title, CommissionTotal, PwHash FROM Employees";
+    $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal, Street FROM Employees";
     $result = $pdo->query($sql);
     $rows = $result->fetchAll(PDO::FETCH_ASSOC);
     ?>
@@ -33,12 +33,11 @@ include '../lib/db.php';
                 <table border='1'>
                     <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Address</th>
+                    <th>Username</th>
                     <th>Email</th>
+                    <th>Address</th>
                     <th>Title</th>
                     <th>Commission total</th>
-                    <th>Hash Protected Password</th>
                     </tr>
                     
                     <?php foreach($rows as $employee ){
@@ -55,6 +54,7 @@ include '../lib/db.php';
                             echo "<td> No full address on record </td>" ; 
                         }
                         echo "<td> {$employee['Email'] } </td>" ; 
+                        echo "<td> {$employee['Street'] } </td>" ; 
                         echo "<td> {$employee['Title'] } </td>" ;
                         echo "<td> {$employee['CommissionTotal'] } </td>" ;
                         echo "<td> {$employee['PwHash'] } </td>" ;
