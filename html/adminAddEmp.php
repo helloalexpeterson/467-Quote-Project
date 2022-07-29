@@ -12,12 +12,14 @@ session_start(['name' => 'quotes']);
         $empName = $_POST['empName'];
         $title = $_POST['title'];
         $pwd = $_POST['pwd'];
+        $city = $_POST['city'];
+        $street = $_POST['street'];
         $hashed_pwd = password_hash($pwd, PASSWORD_DEFAULT);
     
 
         //insert data into db 
-        $sql = "INSERT INTO Employees (Email, EmpName, Title, PwHash) 
-                    VALUES ('$email', '$empName', '$title', '$hashed_pwd')";
+        $sql = "INSERT INTO Employees (Email, EmpName, City, Street, Title, PwHash) 
+                    VALUES ('$email', '$empName', '$city', '$steet', '$title', '$hashed_pwd')";
 
         $pdo->exec($sql);
 
@@ -54,6 +56,14 @@ session_start(['name' => 'quotes']);
                 case 'Update title':
                     $val=$_POST['title'];
                     updateTitle($pdo, $empID, $val);
+                    break;
+                case 'Update city':
+                    $val=$_POST['empCity'];
+                    updateGiven($pdo, $empID, 'City', $val);
+                    break;
+                case 'Update street':
+                    $val=$_POST['empStreet'];
+                    updateGiven($pdo, $empID, 'Street', $val);
                     break;
                 case 'Update password':
                     if(!$_POST['pwd']){
@@ -140,4 +150,20 @@ session_start(['name' => 'quotes']);
         header("Location: admin.php");
     }
 
+function updateGiven($pdo, $empID, $columnName, $val) {
+    try {
+        $statement = $pdo->prepare("UPDATE Employees SET $columnName = :val WHERE EmployeeID = :empID ");
+        if($statement) {
+                $result = $statement->execute([
+                    ':val' => $val,
+                    ':empID' => $empID
+                ]);
+            }
+        }
+
+    catch (PDOException $e){
+    echo "    <p>Could not query from database. PDO Exception: {$e->getMessage()}</p>\n";
+
+    }
+}
 ?>

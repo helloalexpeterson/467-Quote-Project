@@ -307,11 +307,16 @@ try {
             echo "<label>Discount Amount: </label>";
             echo "<input type='number' name='discount' placeholder='' min='0' max='{$quote['OrderTotal']}' step='0.01' required  $disableDiscount >";
             echo "<button type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
-            if(isset($lineTotal)){
-                $discountTotal = $lineTotal - $orderTotal;
-                $discountTotal = round($discountTotal, $precision = 2);
-                echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
+
+            $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
+            $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
+            $lineTotal=0;
+            foreach($lineItems as $line){
+                $lineTotal= $lineTotal + ($line['Cost']); 
             }
+            $discountTotal = $lineTotal - $orderTotal;
+            $discountTotal = round($discountTotal, $precision = 2);
+            echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
             $orderTotal = round($orderTotal, $precision = 2);
             echo "<label>Amount: &dollar;{$orderTotal}</label>";
         echo "</form>";
@@ -332,15 +337,15 @@ try {
            // }
             echo "<input type=hidden name='quoteID' value={$quoteID}>";
             //echo "<input type=hidden name='email' value={$email}>";
-            if($_SESSION['userType']=='Sales Associate' && $quote['OrderStatus'] == "open"){
+            if(($_SESSION['userType'] == "Superuser" || $_SESSION['userType']=='Sales Associate') && $quote['OrderStatus'] == "open"){
                 echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
                 echo "<button type=submit name=submitBtn value='Finalize Quote' id=submitBtn $disableSubmit>Finalize Quote</button>";
             }
-            if($_SESSION['userType']=='Headquarters' && $quote['OrderStatus'] == "finalized"){
+            if(($_SESSION['userType'] == "Superuser" || $_SESSION['userType']=='Headquarters') && $quote['OrderStatus'] == "finalized"){
                 echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
                 echo "<button type=submit name=submitBtn value='Sanction Quote' id=submitBtn $disableSubmit>Sanction Quote</button>";
             }
-            if($_SESSION['userType']=='Headquarters' && $quote['OrderStatus'] == "sanctioned"){
+            if(($_SESSION['userType'] == "Superuser" ||$_SESSION['userType']=='Headquarters') && $quote['OrderStatus'] == "sanctioned"){
                 echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
                 echo "<button type=submit name=submitBtn value='Order Quote' id=submitBtn $disableSubmit>Order Quote</button>";
             }

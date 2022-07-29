@@ -176,6 +176,7 @@ function login($user, $pass){
         $_SESSION["userType"] = $row['Title'];
         $_SESSION["username"] = $row['EmpName'];
         switch( $row['Title'] ){
+            case 'Superuser':
             case 'Sales Associate':    
             header("Location: open.php?type=open", 303);
             break;
@@ -219,6 +220,9 @@ function advanceQuoteStatus($quoteID, $buttonText){
             if($prepared){ 
                 $prepared->execute();
             } 
+            if(!sendCustomerEmail($pdo, $quoteID, $quote['Email'], 'quote')) {
+                echo "Email failed to send during sanctioning";
+            }
             return $msg ="Quote $quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to {$quote['Email']}";
             break;
 
@@ -230,10 +234,28 @@ function advanceQuoteStatus($quoteID, $buttonText){
                     if($prepared){ 
                         $prepared->execute();
                     } 
-                $msg = "Quote $quoteID submitted for purchasing. A copy of this order has been sent to {$quote['Email']}";
+                    $percent = str_replace('%', '', $result['commission']);
+                    $pay = $result['amount'] * ($percent/100.00);    
+                $msg = "Quote $quoteID submitted for purchasing.<br> 
+                A copy of this order has been sent to {$quote['Email']} <br> 
+                The total for this order is &#36;{$result['amount']} <br>
+                The commission rate for this order is {$result['commission']} <br> 
+                The total commission paid to the associate is &#36;{$pay}";
+
+                $sql = "UPDATE Quotes SET CommissionRate = ? WHERE QuoteID = $quoteID";
+                $prepared = $pdo->prepare($sql);
+                    if($prepared){ 
+                        $prepared->execute([$percent]);
+                    }     
+
             } else {   
                 $msg = "Error with submitting purchase order to processor: $result";
             }
+
+            if(!sendCustomerEmail($pdo, $quoteID, $quote['Email'], 'order')) {
+                echo "Email failed to send during order creation";
+            }
+
             return $msg; 
             break;
             
@@ -279,8 +301,9 @@ function submitPO($quoteID, $EmployeeID, &$result){
 
 function createPO($pdo, $result){
     global $debug;
-    $sql = 'INSERT INTO PurchaseOrders(QuoteID , EmployeeID , CustomerID , OrderTotal , CustomerName , CommissionTotal, OrderTime)
+    $sql = 'INSERT INTO PurchaseOrders(QuoteID , EmployeeID , CustomerID , OrderTotal , CustomerName , CommissionRate, OrderTime)
     VALUES (:order, :associate, :custid, :amount, :name, :commission, :timeStamp)';
+    $percent = str_replace('%', '', $result['commission']);
     $statement = $pdo->prepare($sql);
     if($statement){
     $timeStamp = date('Y-m-d H:i', $result['timeStamp']/1000);
@@ -290,7 +313,7 @@ function createPO($pdo, $result){
         ':custid' => $result['custid'],
         ':amount'  => $result['amount'],
         ':name' => $result['name'],
-        ':commission'  => $result['commission'],
+        ':commission'  => $percent,
         ':timeStamp' => $timeStamp]);
     }
     if($debug){echo "<br>****PO inserted into table!!****<br>";}
@@ -328,5 +351,59 @@ function payCommission($pdo, $emp, $total, $commission){
             $statement->execute();
         }
     //}
+}
+
+function sendCustomerEmail($pdo, $quoteID, $email, $type) {
+    include '../config/secrets.php';
+
+    $msg = "First line of text\nSecond line of text";
+    $pdo = connectdb();
+    switch($type) {
+        case 'quote':
+            $prepared = $pdo->prepare("SELECT * FROM Quotes WHERE QuoteID = ?");
+            $prepared->execute([$quoteID]);
+            $quote = $prepared->fetch(PDO::FETCH_ASSOC);
+
+            $msg = implode(" ", $quote);
+            break;
+        case 'order':
+            $prepared = $pdo->prepare("SELECT * FROM PurchaseOrders WHERE QuoteID = ?");
+            $prepared->execute([$quoteID]);
+            $order = $prepared->fetch(PDO::FETCH_ASSOC);
+
+            $msg = implode(" ", $order);
+            break;
+        default:
+            echo "No type given, no email sent.";
+    }
+
+    // use wordwrap() if lines are longer than 70 characters
+    $msg = wordwrap($msg,70);
+    // send email
+    if (true || in_array($email, $canReceiveEmails)) {
+        $subject = 'the subject';
+        $headers = array(
+            'From' => 'webmaster@example.com',
+            'Reply-To' => 'webmaster@example.com',
+            'X-Mailer' => 'PHP/' . phpversion()
+        );
+
+        $success = mail($email, $subject, $msg, $headers);
+        if ($debug) {
+            if ($success) {
+                echo "mail() does not guarentee that the email was send (read documentation)<br>";
+                echo "mail() Sucessful <br>";
+            }
+            else {
+                echo "mail() Failed ";
+            }
+            echo "Email: " . $email . "<br>Message: <blockquote>" . $msg . "</blockquote>";
+        }
+
+        return $success;
+    }
+    else if ($debug)
+        echo "Email not on config list";
+    return false;
 }
 ?>
