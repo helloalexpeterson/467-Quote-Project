@@ -47,17 +47,10 @@ include '../lib/db.php';
                         echo "<td> {$employee['EmployeeID'] } </td>" ; 
                         echo "<input type='hidden' name='empID' value='{$employee['EmployeeID'] }'>";
                         echo "<td> {$employee['EmpName'] } </td>" ; 
-                        if (isset($employee['Street']) && isset($employee['City'])) {
-                            echo "<td> {$employee['Street'] }, {$employee['City'] } </td>" ; 
-                        }
-                        else {
-                            echo "<td> No full address on record </td>" ; 
-                        }
                         echo "<td> {$employee['Email'] } </td>" ; 
                         echo "<td> {$employee['Street'] } </td>" ; 
                         echo "<td> {$employee['Title'] } </td>" ;
                         echo "<td> {$employee['CommissionTotal'] } </td>" ;
-                        echo "<td> {$employee['PwHash'] } </td>" ;
                         echo "<td><button type='submit' name='editAssociate' value='editAssociate' id='editAssociate'>Edit</button></td>";
                         echo "<td><button type='submit' name='deleteAssociate' id='deleteAssociate'>Delete</button></td>";
                         echo "</form>";
