@@ -140,6 +140,7 @@ function login($user, $pass){
         $_SESSION["userType"] = $row['Title'];
         $_SESSION["username"] = $row['EmpName'];
         switch( $row['Title'] ){
+            case 'Superuser':
             case 'Sales Associate':    
             header("Location: open.php?type=open", 303);
             break;

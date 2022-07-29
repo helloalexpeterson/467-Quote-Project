@@ -12,21 +12,21 @@
 <?php 
 echo "<b> Logged in as: {$_SESSION['username']} - {$_SESSION['userType']}</b>";
 echo "<ul class='navbar-nav me-auto mb-2 mb-lg-0'>";
-if($_SESSION['userType'] == 'Sales Associate'){
+if($_SESSION['userType'] == 'Sales Associate' || $_SESSION['userType'] == 'Superuser'){
     echo<<<HTML
                 <li class="nav-item"><a class="nav-link" href='quotes.php?type=open'>Open Quotes</a></li>
                 <li class="nav-item"><a class="nav-link" href='open.php'>Create New Quote</a></li>
                 <li class="nav-item"><a class="nav-link" href='#'>My Commissions</a></li>           
        HTML;
    } 
-   if($_SESSION['userType'] == 'Headquarters'){
+   if($_SESSION['userType'] == 'Headquarters' || $_SESSION['userType'] == 'Superuser'){
     echo<<<HTML
                 <li class="nav-item"><a class="nav-link" href='quotes.php?type=finalized'>Finalized Quotes</a></li>
                 <li class="nav-item"><a class="nav-link" href='quotes.php?type=sanctioned'>Sanctioned Quotes</a></li>
                 <li class="nav-item"><a class="nav-link" href='quotes.php?type=ordered'>Ordered Quotes</a></li>  
        HTML;
    } 
-   if($_SESSION['userType'] == 'Administrator'){
+   if($_SESSION['userType'] == 'Administrator' || $_SESSION['userType'] == 'Superuser'){
     echo<<<HTML
                 <li class="nav-item"><a class="nav-link" href='admin.php'>Associate Management</a></li>  
                 <li class="nav-item"><a class="nav-link" href='#'>Quote Management</a></li>  
