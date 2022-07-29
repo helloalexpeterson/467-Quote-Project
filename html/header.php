@@ -16,7 +16,7 @@ if($_SESSION['userType'] == 'Sales Associate' || $_SESSION['userType'] == 'Super
     echo<<<HTML
                 <li class="nav-item"><a class="nav-link" href='quotes.php?type=open'>Open Quotes</a></li>
                 <li class="nav-item"><a class="nav-link" href='open.php'>Create New Quote</a></li>
-                <li class="nav-item"><a class="nav-link" href='#'>My Commissions</a></li>           
+                <li class="nav-item"><a class="nav-link" href='myCommissions.php'>My Commissions</a></li>           
        HTML;
    } 
    if($_SESSION['userType'] == 'Headquarters' || $_SESSION['userType'] == 'Superuser'){
