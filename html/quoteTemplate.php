@@ -4,6 +4,8 @@ session_start(['name' => 'quotes']);
 include '../lib/db.php';
 include '../lib/func.php';
 
+// form action for advancing quote status
+// show a success or an error message
 $msg = ''; 
 if(isset($_POST['submitBtn']) && isset($_POST['submitBtn'])){
 
@@ -12,20 +14,6 @@ if(isset($_POST['submitBtn']) && isset($_POST['submitBtn'])){
 }    
 $pagetitle="View Quote";
 include 'header.php';
-
-//debug print
-if($debug){
-    echo "ignore this - debug info"; 
-    echo "<br>";
-    echo "<pre>  'SESSION'";  
-    print_r($_SESSION);   
-    echo "</pre>" ;
-
-    echo "<br>";
-    echo "<pre>  'POST'";  
-    print_r($_POST);   
-    echo "</pre>" ;
-}
 
 error_reporting(E_ALL);
 try {
@@ -155,25 +143,18 @@ try {
             }
             $discount = (float)$_POST['discount'];
             
-            if ($discount > $lineTotal) { $errorMsg = "Error: discount too large"; }
             // requery quote
-            else {
-                $orderTotal = $lineTotal - $discount;
-                $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
-                $prepared->execute([$orderTotal]);
+            $orderTotal = $lineTotal - $discount;
+            $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
+            $prepared->execute([$orderTotal]);
 
-                $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
-                $quote = $result->fetch(PDO::FETCH_ASSOC);
-            }
+            $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
+            $quote = $result->fetch(PDO::FETCH_ASSOC);
             break;
     }
-
     //END OF FORM FUNC
 
     //Switch to disable email, notes, lines, discounts fields based on order status
-
-
-  
     switch($quote['OrderStatus']){
         case 'open':
             $disableEmail = '';
@@ -205,6 +186,7 @@ try {
             break;
     }
 
+    // allow sales associate and admin to see quote in a readonly state
     if($_SESSION['userType'] == "Sales Associate" && $quote['OrderStatus'] !== "open" || $_SESSION['userType'] == "Administrator" ){
         $disableEmail = 'disabled';
         $disableLines = 'disabled';
@@ -254,6 +236,7 @@ try {
 
     if ($lineCount == 0) { echo "<div class='noItem'>No line items</div>"; }
 
+    // add lines
     if (!$disableLines) {
         echo "<form id='addedLine' action='#addedLine' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
@@ -287,6 +270,7 @@ try {
 
     if ($count == 0) { echo "<div class='noItem'>No secret notes</div>"; }
 
+    // add secret notes
     if (!$disableNotes) {
         echo "<form id='addedNote' action='#addedNote' method='POST'>";
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
@@ -296,30 +280,32 @@ try {
     }
 
     // Discount
-        echo "<form id='discounted' class='discountPercent' action='#discounted' method='POST'>";
-            echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-            echo "<label>Discount %: </label>";
-            echo "<input type='number' name='discount' placeholder='' min='0' max='100' required $disableDiscount >";
-            echo "<button type='submit' name='formAction' value='discountPercent' required $disableDiscount >Apply</button><br>";
-        echo "</form>";
-        echo "<form class='discountAmount' action='#discounted' method='POST'>";
-            echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-            echo "<label>Discount Amount: </label>";
-            echo "<input type='number' name='discount' placeholder='' min='0' max='{$quote['OrderTotal']}' step='0.01' required  $disableDiscount >";
-            echo "<button type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
+    $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
+    $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
+    $lineTotal=0;
+    foreach($lineItems as $line){
+        $lineTotal= $lineTotal + ($line['Cost']); 
+    }
 
-            $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
-            $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
-            $lineTotal=0;
-            foreach($lineItems as $line){
-                $lineTotal= $lineTotal + ($line['Cost']); 
-            }
-            $discountTotal = $lineTotal - $orderTotal;
-            $discountTotal = round($discountTotal, $precision = 2);
-            echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
-            $orderTotal = round($orderTotal, $precision = 2);
-            echo "<label>Amount: &dollar;{$orderTotal}</label>";
-        echo "</form>";
+    echo "<form id='discounted' class='discountPercent' action='#discounted' method='POST'>";
+        echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
+        echo "<label>Discount %: </label>";
+        echo "<input type='number' name='discount' placeholder='' min='0' max='100' required $disableDiscount >";
+        echo "<button type='submit' name='formAction' value='discountPercent' required $disableDiscount >Apply</button><br>";
+    echo "</form>";
+    echo "<form class='discountAmount' action='#discounted' method='POST'>";
+        echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
+        echo "<label>Discount Amount: </label>";
+        echo "<input type='number' name='discount' placeholder='' min='0' max='{$lineTotal}' step='0.01' required  $disableDiscount >";
+        echo "<button type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
+
+        // show current discounted amount
+        $discountTotal = $lineTotal - $orderTotal;
+        $discountTotal = round($discountTotal, $precision = 2);
+        echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
+        $orderTotal = round($orderTotal, $precision = 2);
+        echo "<label>Amount: &dollar;{$orderTotal}</label>";
+    echo "</form>";
 
     //Finalize quote/Sanction Quote/Order quote button
     if($quote['OrderStatus'] !== 'ordered'){ 
@@ -332,11 +318,7 @@ try {
         
             $quoteID = isset($_GET['quoteID']) ? $_GET['quoteID']: $quoteID;
             $email = isset($_POST['Email']) ? $_POST['Email'] : $quote['Email'];
-            //foreach($quote as $k => $v){
-           // echo "<input type=hidden name='{$k}' value={$v}>";
-           // }
             echo "<input type=hidden name='quoteID' value={$quoteID}>";
-            //echo "<input type=hidden name='email' value={$email}>";
             if(($_SESSION['userType'] == "Superuser" || $_SESSION['userType']=='Sales Associate') && $quote['OrderStatus'] == "open"){
                 echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
                 echo "<button type=submit name=submitBtn value='Finalize Quote' id=submitBtn $disableSubmit>Finalize Quote</button>";
@@ -359,13 +341,14 @@ catch(PDOexception $e) {
     echo "Connection failed: " . $e->getMessage();
 }
 
-//dirty and inefficent
-//designed to run after after a quote query
-//returns updated quote query
+// addToTotal
+// input: internal database pdo, quote info, quoteID, cost to add
+// returns updated quote query
+//
+// adds new line item cost to overall total
+// dirty and inefficent
+// designed to run after after a quote query
 function addToTotal($pdo, $quote, $quoteID, $cost) {
-    // $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
-    // $quote = $result->fetch(PDO::FETCH_ASSOC);
-
     $orderTotal = $quote['OrderTotal'] + $cost;
 
     if($orderTotal < 0)
@@ -379,19 +362,17 @@ function addToTotal($pdo, $quote, $quoteID, $cost) {
 
     return $quote;
 }
+
+// editTotal
+// input: internal database pdo, quote info, quoteID, line id of edited line, cost to add
+// returns updated quote query
+//
+// makes overal total reflects line item cost changes
 function editTotal($pdo, $quote, $quoteID, $lineID, $cost) {
-    // $result = $pdo->query("SELECT * FROM Quotes where QuoteID = $quoteID");
-    // $quote = $result->fetch(PDO::FETCH_ASSOC);
-
-    // $orderTotal = $quote['OrderTotal'] + $cost;
-
     $result = $pdo->query("SELECT * FROM LineItems WHERE LineID = $lineID AND QuoteID = $quoteID");
     $lineItem = $result->fetch(PDO::FETCH_ASSOC);
 
     $orderTotal = $quote['OrderTotal'] + $cost - $lineItem['Cost'];
-
-    if($orderTotal < 0)
-        $orderTotal = 0;
 
     $prepared = $pdo->prepare("UPDATE Quotes SET OrderTotal=? WHERE QuoteID = $quoteID");
     $prepared->execute([$orderTotal]);
