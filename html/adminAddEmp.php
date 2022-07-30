@@ -12,14 +12,13 @@ session_start(['name' => 'quotes']);
         $empName = $_POST['empName'];
         $title = $_POST['title'];
         $pwd = $_POST['pwd'];
-        $city = $_POST['city'];
         $street = $_POST['street'];
         $hashed_pwd = password_hash($pwd, PASSWORD_DEFAULT);
     
 
         //insert data into db 
-        $sql = "INSERT INTO Employees (Email, EmpName, City, Street, Title, PwHash) 
-                    VALUES ('$email', '$empName', '$city', '$street', '$title', '$hashed_pwd')";
+        $sql = "INSERT INTO Employees (Email, EmpName, Street, Title, PwHash) 
+                    VALUES ('$email', '$empName', '$street', '$title', '$hashed_pwd')";
 
         $pdo->exec($sql);
 
