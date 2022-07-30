@@ -109,7 +109,7 @@ include '../lib/db.php';
 
 echo "<h3>List of {$_GET['type']} quotes:</h3>";
 $db = connectdb();
-$dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal, Quotes.DateOpened FROM Quotes WHERE OrderStatus = ?;";
+$dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal, Quotes.StartDate FROM Quotes WHERE OrderStatus = ?;";
 $statement = $db->prepare($dbsql);
 $dbresult = $statement->execute([$_GET['type']]);            
 $dbrow = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -129,7 +129,7 @@ if($statement->rowCount() > 0){
     echo "<td> {$row['QuoteID'] } </td>" ; 
     echo "<td> {$row['CustomerName'] } </td>" ; 
     echo "<td> {$row['OrderTotal'] } </td>" ; 
-    echo "<td> {$row['DateOpened'] } </td>";
+    echo "<td> {$row['StartDate'] } </td>";
     echo "<td><a href=\"quoteTemplate.php?quoteID={$row['QuoteID']}\" class='btn btn-primary'> $buttonText</a></td> ";
     echo "</tr>";
 }
