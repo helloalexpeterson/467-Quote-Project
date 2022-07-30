@@ -66,8 +66,9 @@ include '../lib/db.php';
                 <button id='fNameBtnn' onclick="sortTable('string', 1, 'assocTable')">Sort By First Name</button>
                 <button id='lnameBtn' onclick="sortTable('lname', 1, 'assocTable')">Sort By Last Name</button>
                 <button id='emailBtn' onclick="sortTable('string', 2, 'assocTable')">Sort By Email</button>
-                <button id='titleBtn' onclick="sortTable('string', 3, 'assocTable')">Sort By Title</button>
-                <button id='commissionBtn' onclick="sortTable('number', 4, 'assocTable')">Sort By Commission</button>
+                <button id='titleBtn' onclick="sortTable('string', 3, 'assocTable')">Sort By Address</button>
+                <button id='titleBtn' onclick="sortTable('string', 4, 'assocTable')">Sort By Title</button>
+                <button id='commissionBtn' onclick="sortTable('number', 5, 'assocTable')">Sort By Commission</button>
 
                 <script src="tablesort.js"></script>
             </div><br>
