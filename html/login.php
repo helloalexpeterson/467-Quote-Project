@@ -34,7 +34,7 @@ if(isset($_POST['action'])){
     <label >Username:</label><br>
     <input type="text" id="user" name="user" value=""><br>
     <label >Password:</label><br>
-    <input type="text" id="pass" name="pass" value=""><br><br>
+    <input type="password" id="pass" name="pass" value=""><br><br>
     <input type="submit" value="login" name="action">
     </form> 
     </center> 
