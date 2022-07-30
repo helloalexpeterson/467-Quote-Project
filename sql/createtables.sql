@@ -24,6 +24,7 @@ CREATE TABLE Quotes (
     CommissionRate INT(2),
     OrderTotal DECIMAL(10, 2) DEFAULT 0.00,
     StartDate  DATE NOT NULL DEFAULT CURRENT_DATE(), 
+
     FOREIGN KEY(EmployeeID) REFERENCES Employees
 );
 

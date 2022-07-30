@@ -120,5 +120,53 @@ $mydb = connectdb();
   }
   
 ?>
+<<<<<<< HEAD
+
+<?php 
+    echo "<h3>List of $querytype quotes:</h3>";
+    $db = connectdb();
+    $dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal FROM Quotes WHERE OrderStatus = '$querytype';";
+
+    /* enable this feature if we want to only show quotes for logged in associate
+    if($_SESSION['userType'] === 'Sales Associate')
+    {
+      $userID = $_SESSION['userID'];
+      $dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal FROM Quotes WHERE OrderStatus = '$querytype' AND Quotes.EmployeeID = '$userID';";
+    } */
+
+    $dresult = $db->query($dbsql);
+    $dbrow = $dresult->fetchAll(PDO::FETCH_ASSOC);
+
+    // echo "<pre>"; echo "rows queried"; echo "<br>"; print_r($dbrow);    echo "</pre>";
+
+        echo "<table border='1'>
+        <tr>
+        <th>QuoteID</th>
+        <th>Name</th>
+        <th>Order Total</th>
+        </tr>";
+    
+        $quoteCount = 0;
+        foreach($dbrow as $row){
+          $quoteCount++;
+        echo "<tr>";
+        echo "<td> {$row['QuoteID'] } </td>" ; 
+        echo "<td> {$row['CustomerName'] } </td>" ; 
+        echo "<td> {$row['OrderTotal'] } </td>" ; 
+        // echo "<td> {$row['DateOpened'] } </td>";
+        // echo "<td> {$row['DateModified'] } </td>";
+        // echo "<td> {$row['DateProcessed'] } </td>";
+        echo "<td><form action=\"quoteTemplate.php\" method=\"POST\">";
+             echo "<input type=\"hidden\" name=\"quoteID\" value=\"{$row['QuoteID']}\"/>";
+             echo "<button type=\"submit\">$buttonText</button> ";
+         echo "</form></td>";
+
+        echo "</tr>";
+    }
+    echo "</table>";
+    echo "<b>$quoteCount quotes found</b>";
+    ?>
+=======
+>>>>>>> main
   </body>
 </html>
