@@ -7,7 +7,8 @@ CREATE TABLE Employees (
     Title ENUM('Sales Associate', 'Headquarters', 'Administrator', 'Superuser'),
     PwHash VARCHAR(64) NOT NULL,
     PwText VARCHAR(64),
-    CommissionTotal DOUBLE(8,2) DEFAULT 0.00
+    CommissionTotal DOUBLE(10,2) DEFAULT 0.00,
+    Street VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE Quotes (
@@ -22,9 +23,7 @@ CREATE TABLE Quotes (
     OrderStatus ENUM('open', 'finalized', 'sanctioned', 'ordered'),
     CommissionRate INT(2),
     OrderTotal DECIMAL(10, 2) DEFAULT 0.00,
-    DateOpened DATE DEFAULT CURRENT_DATE(),
-    DateModified DATE DEFAULT CURRENT_DATE(),
-    DateProcessed DATE,
+    StartDate  DATE NOT NULL DEFAULT CURRENT_DATE(), 
 
     FOREIGN KEY(EmployeeID) REFERENCES Employees
 );
@@ -33,7 +32,6 @@ CREATE TABLE Notes (
 	NoteID INT PRIMARY KEY AUTO_INCREMENT,
     QuoteID INT, 
 	Note VARCHAR(128),
-    
     FOREIGN KEY(QuoteID) REFERENCES Quotes 
 );
 

@@ -21,7 +21,7 @@ include '../lib/db.php';
 <body>
     <?php 
     $pdo = connectdb();
-    $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal FROM Employees";
+    $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal, Street FROM Employees";
     $result = $pdo->query($sql);
     $rows = $result->fetchAll(PDO::FETCH_ASSOC);
     ?>
@@ -33,8 +33,9 @@ include '../lib/db.php';
                 <table border='1' id='assocTable'>
                     <tr>
                     <th>ID</th>
-                    <th>Name</th>
+                    <th>Username</th>
                     <th>Email</th>
+                    <th>Address</th>
                     <th>Title</th>
                     <th>Commission total</th>
                     </tr>
@@ -45,10 +46,13 @@ include '../lib/db.php';
                         echo "<form method='POST' action='adminAddEmp.php'>";
                         echo "<td>{$employee['EmployeeID'] }</td>" ; 
                         echo "<input type='hidden' name='empID' value='{$employee['EmployeeID'] }'>";
-                        echo "<td>{$employee['EmpName'] }</td>" ; 
-                        echo "<td>{$employee['Email'] }</td>" ; 
-                        echo "<td>{$employee['Title'] }</td>" ;
-                        echo "<td>{$employee['CommissionTotal'] } </td>" ;
+
+                        echo "<td> {$employee['EmpName'] }</td>" ; 
+                        echo "<td> {$employee['Email'] }</td>" ; 
+                        echo "<td> {$employee['Street'] }</td>" ; 
+                        echo "<td> {$employee['Title'] }</td>" ;
+                        echo "<td> {$employee['CommissionTotal'] }</td>" ;
+
                         echo "<td><button type='submit' name='editAssociate' value='editAssociate' id='editAssociate'>Edit</button></td>";
                         echo "<td><button type='submit' name='deleteAssociate' id='deleteAssociate'>Delete</button></td>";
                         echo "</form>";
@@ -72,11 +76,13 @@ include '../lib/db.php';
                 <h3>Add a new user:</h3>
                 <form method="POST" action="adminAddEmp.php">
                     <label for="empName">Name:</label>
-                    <input type="text" id="empName" name="empName" placeholder="Associate name"><br>
+                    <input type="text" id="empName" name="empName" placeholder="Associate name" required><br>
                     <label for="pwd">Password:</label>
-                    <input type="password" id="pwd" name="pwd" placeholder="Associate password"><br>
+                    <input type="password" id="pwd" name="pwd" placeholder="Associate password" required><br>
                     <label for="email">E-mail:</label>
-                    <input type="email" id="email" name="email" placeholder="Associate E-mail"><br><br>
+                    <input type="email" id="email" name="email" placeholder="Associate E-mail" required><br>
+                    <label for="street">Address:</label>
+                    <input type="text" id="street" name="street" placeholder="Associate Address" required><br><br>
                   
                     <label for="title">Title:</label>
                     <select id="title" name="title">

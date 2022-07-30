@@ -34,6 +34,36 @@ session_start(['name' => 'quotes']);
       }
       echo "<br> Query type is: $querytype<br>";
       break;
+          // probably shoulda used if statements or a different variable to deal with superusers priveleges 
+    case 'Superuser':
+      $querytype="";
+      if (isset($_GET['type']) && $_GET['type'] == 'Open Quotes'){
+        $querytype="open";
+        $buttonText = "Edit Quote";
+        $headermsg =  "Create new quote for customer"; 
+      }
+      else if (isset($_GET['type']) && $_GET['type'] == 'sanctioned'){
+        $querytype="finalized";
+        $buttonText = "Sanction Quote";
+        $headermsg =  "Sanction finalized quotes"; 
+      }
+      else if (isset($_GET['type']) && $_GET['type'] == 'Sanctioned Quotes'){
+        $buttonText = "Order Quote";
+        $querytype="sanctioned";
+        $headermsg =  "Order sanctioned quotes";
+      }
+      else if (isset($_GET['type']) && $_GET['type'] == 'ordered'){
+        $buttonText = "Review Quote";
+        $querytype="ordered";
+        $headermsg =  "Review quotes submitted for purchase";
+      }
+      else {
+        $querytype="open";
+        $buttonText = "Edit Quote";
+        $headermsg =  "Create new quote for customer"; 
+      }
+      echo "<br> Query type is: $querytype<br>";
+      break;
 
       default:
       echo "You do not have permission to view this page. Please login as the appropriate user.";

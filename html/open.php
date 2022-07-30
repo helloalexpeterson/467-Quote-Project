@@ -4,6 +4,7 @@ $pagetitle = "Create a new quote";
 include 'header.php'; 
 
 switch($_SESSION['userType']){
+  case 'Superuser':
   case 'Sales Associate':
     $querytype="open";
     $buttonText = "Edit Quote";
@@ -31,30 +32,6 @@ switch($_SESSION['userType']){
     }
     echo "<br> Query type is: $querytype<br>";
     break;
-    // probably shoulda used if statements or a different variable to deal with superusers priveleges 
-    case 'Superuser':
-      if ($_POST['menuType'] == 'Open Quotes'){
-        $querytype="open";
-        $buttonText = "Edit Quote";
-        $headermsg =  "Create new quote for customer"; 
-      }
-      else if ($_POST['menuType'] == 'Finalized Quotes'){
-        $querytype="finalized";
-        $buttonText = "Sanction Quote";
-        $headermsg =  "Sanction finalized quotes"; 
-      }
-      else if ($_POST['menuType'] == 'Sanctioned Quotes'){
-        $buttonText = "Order Quote";
-        $querytype="sanctioned";
-        $headermsg =  "Order sanctioned quotes";
-      }
-      else if ($_POST['menuType'] == 'Ordered Quotes'){
-        $buttonText = "Review Quote";
-        $querytype="ordered";
-        $headermsg =  "Review quotes submitted for purchase";
-      }
-      echo "<br> Query type is: $querytype<br>";
-      break;
     default:
     echo "You do not have permission to view this page. Please login as the appropriate user.";
       
@@ -112,7 +89,7 @@ $mydb = connectdb();
   
 <?php 
   
-  if(isset($_SESSION['userType']) && $_SESSION['userType'] == 'Sales Associate' || isset($_POST['menuType']) && $_POST['menuType'] == 'Open Quotes' )
+  if(isset($_SESSION['userType']) && $_SESSION['userType'] == 'Sales Associate' || $_SESSION['userType'] == 'Superuser' )
   { 
 
     $sql = "SELECT id, name FROM customers";
