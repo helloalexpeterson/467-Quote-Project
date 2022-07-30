@@ -66,6 +66,36 @@ VALUES ('3','500','1','New ice cream' );
 
 INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
 VALUES ('3','780','1','Heart transplant' );
+-- Here
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('4','1000','1','Distributor Calibration' );
+
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('4','100','1','Clean 02 Filter' );
+
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('5','800','1','Decontamination Station' );
+
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('5','200','4','Fixed Wiring' );
+
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('6','125','3','Open Waterways' );
+
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('6','200','1','Process Data' );
+
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('7','540','2','Unlock Manifolds' );
+
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('7','8100','1','Reactor Maintenance' );
+
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('8','260','1','Repair Drill' );
+
+INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
+VALUES ('8','780','1','Stabilize Steering' );
 
 INSERT INTO Notes (QuoteID, Note)
 VALUES ('1', "Customer is very rude");
