@@ -67,11 +67,11 @@ include '../lib/db.php';
                 <h3>Add a new user:</h3>
                 <form method="POST" action="adminAddEmp.php">
                     <label for="empName">Name:</label>
-                    <input type="text" id="empName" name="empName" placeholder="Associate name"><br>
+                    <input type="text" id="empName" name="empName" placeholder="Associate name" required><br>
                     <label for="pwd">Password:</label>
-                    <input type="password" id="pwd" name="pwd" placeholder="Associate password"><br>
+                    <input type="password" id="pwd" name="pwd" placeholder="Associate password" required><br>
                     <label for="email">E-mail:</label>
-                    <input type="email" id="email" name="email" placeholder="Associate E-mail"><br><br>
+                    <input type="email" id="email" name="email" placeholder="Associate E-mail" required><br><br>
                   
                     <label for="title">Title:</label>
                     <select id="title" name="title">
