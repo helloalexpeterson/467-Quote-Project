@@ -71,7 +71,9 @@ include '../lib/db.php';
                     <label for="pwd">Password:</label>
                     <input type="password" id="pwd" name="pwd" placeholder="Associate password" required><br>
                     <label for="email">E-mail:</label>
-                    <input type="email" id="email" name="email" placeholder="Associate E-mail" required><br><br>
+                    <input type="email" id="email" name="email" placeholder="Associate E-mail" required><br>
+                    <label for="street">Address:</label>
+                    <input type="text" id="street" name="street" placeholder="Associate Address" required><br><br>
                   
                     <label for="title">Title:</label>
                     <select id="title" name="title">
