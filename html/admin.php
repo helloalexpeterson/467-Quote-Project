@@ -43,12 +43,12 @@ include '../lib/db.php';
                         //print a table of employees and buttons to edit and delete
                         echo "<tr>";
                         echo "<form method='POST' action='adminAddEmp.php'>";
-                        echo "<td> {$employee['EmployeeID'] } </td>" ; 
+                        echo "<td>{$employee['EmployeeID'] }</td>" ; 
                         echo "<input type='hidden' name='empID' value='{$employee['EmployeeID'] }'>";
-                        echo "<td> {$employee['EmpName'] } </td>" ; 
-                        echo "<td> {$employee['Email'] } </td>" ; 
-                        echo "<td> {$employee['Title'] } </td>" ;
-                        echo "<td> {$employee['CommissionTotal'] } </td>" ;
+                        echo "<td>{$employee['EmpName'] }</td>" ; 
+                        echo "<td>{$employee['Email'] }</td>" ; 
+                        echo "<td>{$employee['Title'] }</td>" ;
+                        echo "<td>{$employee['CommissionTotal'] } </td>" ;
                         echo "<td><button type='submit' name='editAssociate' value='editAssociate' id='editAssociate'>Edit</button></td>";
                         echo "<td><button type='submit' name='deleteAssociate' id='deleteAssociate'>Delete</button></td>";
                         echo "</form>";
@@ -66,7 +66,6 @@ include '../lib/db.php';
                 <button id='commissionBtn' onclick="sortTable('number', 4, 'assocTable')">Sort By Commission</button>
 
                 <script src="tablesort.js"></script>
-              
             </div><br>
             <!--Print a form to add a new associate -->        
             <div class="addAssociate">

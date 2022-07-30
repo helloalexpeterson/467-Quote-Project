@@ -28,33 +28,16 @@ switch(sortType){
             return !cmp;
     };
     break;
-
-//   case "numAscend":
-//   compFunc = (x, y) => {
-//       return Number(x) > Number(y);
-//   };
-//   break;
   
     case "lname":
     compFunc = (x, y, asc) => {
-
-/*
-    var compFunc = (x, y) => {
-        const xnames = x.split(" ");
-        const ynames = y.split(" ");
-
-        return (xnames[xnames.length - 1].toLowerCase() > ynames[ynames.length - 1].toLowerCase());
-    };
-    break;
-*/
-
       const xnames = x.split(" ");
       const ynames = y.split(" ");
 
       let xlname = xnames[xnames.length - 1];
       let ylname = ynames[ynames.length - 1];
 
-      if (xlname.toLowerCase() == ylname.toLowerCase()) return false;
+      if (xlname.toLowerCase() === ylname.toLowerCase()) { return false; }
       
       let cmp = (xlname.toLowerCase() > ylname.toLowerCase());
       if (asc)
@@ -80,6 +63,7 @@ var asc = true, switchcount = 0;
 var switching = true;
 
 while (switching) {
+
   // Start by saying: no switching is done:
   switching = false;
   rows = table.rows;
