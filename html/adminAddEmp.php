@@ -127,7 +127,7 @@ session_start(['name' => 'quotes']);
                     <input type="submit" name="action" value="Update title"><br>
 
                     <label for="commission">Commission:</label>
-                    <input type="number" id="commission" name="commission" placeholder="{$row['CommissionTotal']}" min="0">
+                    <input type="number" id="commission" name="commission" placeholder="{$row['CommissionTotal']}" min="0" step='0.01'>
                     <input type="submit" name="action" value="Update commission"><br><br>
 
         HTML;
