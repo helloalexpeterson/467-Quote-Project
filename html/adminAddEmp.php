@@ -19,7 +19,7 @@ session_start(['name' => 'quotes']);
 
         //insert data into db 
         $sql = "INSERT INTO Employees (Email, EmpName, City, Street, Title, PwHash) 
-                    VALUES ('$email', '$empName', '$city', '$steet', '$title', '$hashed_pwd')";
+                    VALUES ('$email', '$empName', '$city', '$street', '$title', '$hashed_pwd')";
 
         $pdo->exec($sql);
 
