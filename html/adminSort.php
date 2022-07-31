@@ -30,25 +30,6 @@ session_start(['name' => 'quotes']);
 include '../lib/func.php';
 include '../lib/db.php';
 
-   //debug print
-   if($debug){
-    echo "ignore this - debug info"; 
-    echo "<br>";
-    echo "<pre>  'SESSION'";  
-    print_r($_SESSION);   
-    echo "</pre>" ;
-
-    echo "<br>";
-    echo "<pre>  'POST'";  
-    print_r($_POST);   
-    echo "</pre>" ;
-
-    echo "<pre> 'GET'";  
-    print_r($_GET);  
-    echo "<br>";  
-    echo "</pre> <br>";
-}
-
 echo "<h3>List of all quotes:</h3>";
 $month = date('m');
 $day = date('d');
