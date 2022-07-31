@@ -38,7 +38,7 @@ INSERT INTO Quotes (CustomerID, CustomerName, City, Street, Contact, Email, Empl
 VALUES ('6','Bell South','Atlanta, GA','Braves Parkway','1-305-970-BELL', 'bell@bell.com','1','sanctioned', '7', '2000', '2022-07-15');
 
 INSERT INTO PurchaseOrders(QuoteID , EmployeeID , CustomerID , OrderTotal , CustomerName , CommissionRate)
-VALUES ('1','1','1','1000','IBM Corporation', '5' );
+VALUES ('5','2','4','69.69','Insight Technologies Group', '10' );
 
 INSERT INTO LineItems(QuoteID, Cost, Quantity, ServiceDesc)
 VALUES ('1','500','1','New roof' );
