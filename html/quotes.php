@@ -4,14 +4,16 @@ session_start(['name' => 'quotes']);
 <!DOCTYPE html>
 <html>
 <?php 
-  include 'header.php'; 
+include '../lib/func.php';
+include '../lib/db.php';
+$pagetitle = "View Quotes";
+include 'header.php'; 
 
   switch($_SESSION['userType']){
     case 'Sales Associate':
       $querytype="open";
       $buttonText = "Edit Quote";
-      $headermsg =  "Create new quote for customer"; 
-      echo "<br> Query type is: $querytype<br>";
+      $headermsg =  "View Open Quotes"; 
       break;
 
       case 'Headquarters':
@@ -22,17 +24,14 @@ session_start(['name' => 'quotes']);
         $buttonText = "Order Quote";
         $querytype="sanctioned";
         $headermsg =  "Order sanctioned quotes";
-        echo "<br>Query type is: $querytype<br>";
         break;
       }
       if(isset($_GET['type']) && $_GET['type'] === 'ordered'){
         $buttonText = "Review Quote";
         $querytype="ordered";
         $headermsg =  "Review quotes submitted for purchase";
-        echo "<br>Query type is: $querytype<br>";
         break;
       }
-      echo "<br> Query type is: $querytype<br>";
       break;
           // probably shoulda used if statements or a different variable to deal with superusers priveleges 
     case 'Superuser':
@@ -62,7 +61,6 @@ session_start(['name' => 'quotes']);
         $buttonText = "Edit Quote";
         $headermsg =  "Create new quote for customer"; 
       }
-      echo "<br> Query type is: $querytype<br>";
       break;
 
       default:
@@ -75,18 +73,18 @@ session_start(['name' => 'quotes']);
 
   }
   ?>
-  <h2> <?php echo "$headermsg"; ?> </h2> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Select Customer</title>
-    <meta name="description" content="description"/>
-    <meta name="author" content="author" />
-    <meta name="keywords" content="keywords" />
-    <link rel="stylesheet" href="./stylesheet.css" type="text/css" />
-    <style type="text/css">.body { width: auto; }</style>
+
+  <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mt-3">
+                    <div class="card-header">    
+                        <h4 class="mb-3"><?php echo "$headermsg"; ?></h4>
+                    </div>
+                       
     
 <?php
-include '../lib/func.php';
-include '../lib/db.php';
+
 
    //debug print
    if($debug){
