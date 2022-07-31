@@ -183,6 +183,9 @@ try {
             $disableNotes = 'disabled';
             $disableDiscount = 'disabled';
             $buttonText = '';
+            // get order info
+            $result = $pdo->query("SELECT * FROM PurchaseOrders where QuoteID = $quoteID");
+            $order = $result->fetch(PDO::FETCH_ASSOC);
             break;
     }
 
@@ -203,6 +206,15 @@ try {
         <h2>$CustomerName</h2>
         <div class=\"address\">$city<br>$street<br>$contact<br></div>
     HTML;
+
+    // if has order, show info
+    if (isset($order)) {
+        echo "<div>";
+        echo "<br>Fullfilled on: " . $order['ProcessDate'];
+        echo "<br>Commission Rate: " . $order['CommissionRate'] . "%";
+        echo "<br>Commission: $" . number_format((0.01 * $order['CommissionRate'] * $order['OrderTotal']), 2);
+        echo "</div>";
+    }
 
     // Email
     echo "<form class=\"email\" action=\"\" method=\"POST\">";
