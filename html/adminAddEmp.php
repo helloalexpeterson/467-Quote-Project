@@ -1,8 +1,8 @@
 <?php  
 session_start(['name' => 'quotes']); 
-
-    include '../lib/db.php';
-    include '../lib/func.php';
+include 'header.php';
+include '../lib/db.php';
+include '../lib/func.php';
 
     $pdo = connectdb();
 

@@ -9,27 +9,35 @@ include 'header.php';
 include '../lib/func.php';
 include '../lib/db.php';
 ?>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Administration</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="admin.css">
+    <!--- <link rel="stylesheet" href="admin.css"> --->
 </head>
 
-<body>
+<body class="">
     <?php 
     $pdo = connectdb();
     $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal, Street FROM Employees";
     $result = $pdo->query($sql);
     $rows = $result->fetchAll(PDO::FETCH_ASSOC);
     ?>
-        <div class="adminActions">
-            <div class="associatePreview">
+        <div class="container ">
+            <div class="container ">
                 <h2>Sales Associates</h2>
               
                 <div class="individualAssoc">
+                <button id='idBtn' onclick="sortTable('number', 0, 'assocTable')">Sort By Employee ID</button>
+                <button id='fNameBtnn' onclick="sortTable('string', 1, 'assocTable')">Sort By First Name</button>
+                <button id='lnameBtn' onclick="sortTable('lname', 1, 'assocTable')">Sort By Last Name</button>
+                <button id='emailBtn' onclick="sortTable('string', 2, 'assocTable')">Sort By Email</button>
+                <button id='titleBtn' onclick="sortTable('string', 3, 'assocTable')">Sort By Address</button>
+                <button id='titleBtn' onclick="sortTable('string', 4, 'assocTable')">Sort By Title</button>
+                <button id='commissionBtn' onclick="sortTable('number', 5, 'assocTable')">Sort By Commission</button>
+                <br>                <br>
+
                 <table border='1' id='assocTable'>
                     <tr>
                     <th>ID</th>
@@ -61,19 +69,11 @@ include '../lib/db.php';
                     ?>
                  </table>
                 </div>
-                <br>
-                <button id='idBtn' onclick="sortTable('number', 0, 'assocTable')">Sort By Employee ID</button>
-                <button id='fNameBtnn' onclick="sortTable('string', 1, 'assocTable')">Sort By First Name</button>
-                <button id='lnameBtn' onclick="sortTable('lname', 1, 'assocTable')">Sort By Last Name</button>
-                <button id='emailBtn' onclick="sortTable('string', 2, 'assocTable')">Sort By Email</button>
-                <button id='titleBtn' onclick="sortTable('string', 3, 'assocTable')">Sort By Address</button>
-                <button id='titleBtn' onclick="sortTable('string', 4, 'assocTable')">Sort By Title</button>
-                <button id='commissionBtn' onclick="sortTable('number', 5, 'assocTable')">Sort By Commission</button>
-
+                
                 <script src="tablesort.js"></script>
             </div><br>
             <!--Print a form to add a new associate -->        
-            <div class="addAssociate">
+            <div class="container ">
                 <h3>Add a new user:</h3>
                 <form method="POST" action="adminAddEmp.php">
                     <label for="empName">Name:</label>
@@ -96,6 +96,7 @@ include '../lib/db.php';
             </div>
         </div>
     </div>
+</div>
 
 </body>
 
