@@ -87,14 +87,13 @@ function updateTitle($pdo, $empID, $val){
 }
 
 function updatePassword($pdo, $empID, $pass){
-    $sql ='UPDATE Employees SET PwHash = :hash, PwText = :pass WHERE EmployeeID = :empID ;';   
+    $sql ='UPDATE Employees SET PwHash = :hash WHERE EmployeeID = :empID ;';   
     $hash = password_hash($pass, PASSWORD_DEFAULT);
     try {
             $statement = $pdo->prepare($sql);
             if($statement) {
                     $result = $statement->execute([
                         ':hash' => $hash,
-                        ':pass' => $pass,
                         ':empID' => $empID
                     ]);
                 }
