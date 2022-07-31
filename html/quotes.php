@@ -1,17 +1,21 @@
 <?php  
 session_start(['name' => 'quotes']); 
+if(!(isset($_SESSION['userType']))){
+  header("Location: login.php", 303);
+}
 ?>
 <!DOCTYPE html>
 <html>
 <?php 
-  include 'header.php'; 
-
+include '../lib/func.php';
+include '../lib/db.php';
+$pagetitle = "View Quotes";
+include 'header.php'; 
   switch($_SESSION['userType']){
     case 'Sales Associate':
       $querytype="open";
       $buttonText = "Edit Quote";
-      $headermsg =  "Create new quote for customer"; 
-      echo "<br> Query type is: $querytype<br>";
+      $headermsg =  "View Open Quotes"; 
       break;
 
       case 'Headquarters':
@@ -22,17 +26,14 @@ session_start(['name' => 'quotes']);
         $buttonText = "Order Quote";
         $querytype="sanctioned";
         $headermsg =  "Order sanctioned quotes";
-        echo "<br>Query type is: $querytype<br>";
         break;
       }
       if(isset($_GET['type']) && $_GET['type'] === 'ordered'){
         $buttonText = "Review Quote";
         $querytype="ordered";
         $headermsg =  "Review quotes submitted for purchase";
-        echo "<br>Query type is: $querytype<br>";
         break;
       }
-      echo "<br> Query type is: $querytype<br>";
       break;
           // probably shoulda used if statements or a different variable to deal with superusers priveleges 
     case 'Superuser':
@@ -62,7 +63,6 @@ session_start(['name' => 'quotes']);
         $buttonText = "Edit Quote";
         $headermsg =  "Create new quote for customer"; 
       }
-      echo "<br> Query type is: $querytype<br>";
       break;
 
       default:
@@ -75,73 +75,53 @@ session_start(['name' => 'quotes']);
 
   }
   ?>
-  <h2> <?php echo "$headermsg"; ?> </h2> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Select Customer</title>
-    <meta name="description" content="description"/>
-    <meta name="author" content="author" />
-    <meta name="keywords" content="keywords" />
-    <link rel="stylesheet" href="./stylesheet.css" type="text/css" />
-    <style type="text/css">.body { width: auto; }</style>
-    
+  <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mt-3">
+                    <div class="card-header">    
+                        <h4 class="mb-3"><?php echo "$headermsg"; ?></h4>
+                    </div>
+                  </div>
+
 <?php
-include '../lib/func.php';
-include '../lib/db.php';
-
-   //debug print
-   if($debug){
-    echo "ignore this - debug info"; 
-    echo "<br>";
-    echo "<pre>  'SESSION'";  
-    print_r($_SESSION);   
-    echo "</pre>" ;
-
-    echo "<br>";
-    echo "<pre>  'POST'";  
-    print_r($_POST);   
-    echo "</pre>" ;
-
-    echo "<pre> 'GET'";  
-    print_r($_GET);  
-    echo "<br>";  
-    echo "</pre> <br>";
-}
-
-echo "<h3>List of {$_GET['type']} quotes:</h3>";
+//echo "<h5>List of {$_GET['type']} quotes:</h5>";
 $db = connectdb();
 $dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.OrderTotal, Quotes.StartDate FROM Quotes WHERE OrderStatus = ?;";
 $statement = $db->prepare($dbsql);
 $dbresult = $statement->execute([$_GET['type']]);            
 $dbrow = $statement->fetchAll(PDO::FETCH_ASSOC);
 if($statement->rowCount() > 0){
-    echo "<table border='1' id='quoteTable'>
-    <tr>
-    <th>QuoteID</th>
-    <th>Name</th>
-    <th>Order Total</th>
-    <th>Date Opened</th
-    </tr>";}
-
+    echo "<table class='table table-striped' border='1' id='quoteTable'>
+    <thead>
+      <tr>
+        <th scope='col'><a href=\"javascript:sortTable('number', 0, 'quoteTable')\"> Quote ID </a> </th>
+        <th scope='col'><a href=\"javascript:sortTable('string', 1, 'quoteTable')\"> Name </a> </th>
+        <th scope='col'><a href=\"javascript:sortTable('number', 2, 'quoteTable')\"> Total </a> </th>
+        <th scope='col'><a href=\"javascript:sortTable('string', 3, 'quoteTable')\"> Open Date </a> </th>
+        <th scope='col'></th>
+      </tr>
+    </thead>"
+    ;}
+    echo "<tbody>";    
     $quoteCount = 0;
     foreach($dbrow as $row){
         $quoteCount++;
-    echo "<tr>";
-    echo "<td> {$row['QuoteID'] } </td>" ; 
-    echo "<td> {$row['CustomerName'] } </td>" ; 
-    echo "<td> {$row['OrderTotal'] } </td>" ; 
-    echo "<td> {$row['StartDate'] } </td>";
-    echo "<td><a href=\"quoteTemplate.php?quoteID={$row['QuoteID']}\" class='btn btn-primary'> $buttonText</a></td> ";
-    echo "</tr>";
+      echo "<tr>";
+        echo "<td> {$row['QuoteID'] } </td>" ; 
+        echo "<td> {$row['CustomerName'] } </td>" ; 
+        echo "<td> {$row['OrderTotal'] } </td>" ; 
+        echo "<td> {$row['StartDate'] } </td>";
+        echo "<td><a href=\"quoteTemplate.php?quoteID={$row['QuoteID']}\" class='btn btn-primary'> $buttonText</a></td> ";
+      echo "</tr>";
 }
+echo "<tbody>";    
 echo "</table>";
 echo "<b>$quoteCount quotes found</b>";
-echo 
-"<br>
- <button id='idBtn' onclick=\"sortTable('number', 0, 'quoteTable')\">Sort By ID</button>
- <button id='custBtn' onclick=\"sortTable('string', 1, 'quoteTable')\">Sort Alphabetically</button>
- <button id='costBtn' onclick=\"sortTable('number', 2, 'quoteTable')\">Sort By Order Total</button>
- <button id='dateBtn' onclick=\"sortTable('string', 3, 'quoteTable')\">Sort By Date Opened</button>";
 ?>
-  <script src="tablesort.js"></script>
+            </div>
+        </div>
+      </div>
+   <script src="tablesort.js"></script>
   </body>
 </html>

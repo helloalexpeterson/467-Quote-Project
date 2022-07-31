@@ -184,8 +184,16 @@ try {
             $disableDiscount = 'disabled';
             $buttonText = '';
             // get order info
-            $result = $pdo->query("SELECT * FROM PurchaseOrders where QuoteID = $quoteID");
-            $order = $result->fetch(PDO::FETCH_ASSOC);
+            $sql = "SELECT * FROM PurchaseOrders where QuoteID = ?";
+            try{
+                $statement = $pdo->prepare($sql);
+                if($statement->execute([$quoteID])){
+                    if($statement->rowCount()){ 
+                        $order = $statement->fetch(PDO::FETCH_ASSOC);
+                    } else { echo "<p>No rows</p>"; }
+                } else { echo "<p>The querey failed</p>"; }
+            }
+            catch(PDOExecption $e){ echo "<p>There was an error with the database: {$e->getMessage()}</p>"; }
             break;
     }
 
