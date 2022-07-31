@@ -12,7 +12,7 @@ include '../lib/db.php';
 ?>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-10">
+            <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">    
                         <h4 class="mb-3">Create a new quote</h4>
@@ -20,8 +20,8 @@ include '../lib/db.php';
                     <div class="card-body">
                     <form action='quoteTemplate.php' method='POST'>
                         <div class="form-group row">
-                            <label for='id' class="col-md-3 col-form-label text-md-right"><b>First, select a customer:</b></label>
-                            <div class="col-md-9">
+                            <label for='id' class="col-md-6 col-form-label text-md-right"><b>First, select a customer:</b></label>
+                            <div class="col-md-6">
                                 <select id='id' name='id' required class="form-control" >
                                     <option value='' disabled selected>Choose one</option>
 <?php 
