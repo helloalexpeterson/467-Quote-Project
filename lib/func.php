@@ -169,7 +169,7 @@ function login($user, $pass){
     echo "<p>Could not query from database. PDO Exception: {$e->getMessage()}</p>\n";
     }
     
-    if(password_verify($pass, $row['PwHash'])){
+    if($row && password_verify($pass, $row['PwHash'])){
         echo "<br> Password verified! <br>";
 
         $_SESSION["userID"] = $row['EmployeeID'];
@@ -190,7 +190,7 @@ function login($user, $pass){
             break;
 
         } 
-    } else {echo "<br> Password not verified! <br>";}
+    } else {echo "<br> Username or Password invalid! <br>";}
 
 }
 
