@@ -106,7 +106,7 @@ include '../lib/func.php';
                     <input type="submit" name="action" value="Update name"><br>
 
                     <label for="pwd">Password:</label>
-                    <input type="password" id="pwd" name="pwd" placeholder="{$row['PwText']}">
+                    <input type="password" id="pwd" name="pwd" placeholder="">
                     <input type="submit" name="action" value="Update password"><br>
 
                     <label for="email">E-mail:</label>

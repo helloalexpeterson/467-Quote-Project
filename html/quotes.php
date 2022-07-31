@@ -11,7 +11,6 @@ include '../lib/func.php';
 include '../lib/db.php';
 $pagetitle = "View Quotes";
 include 'header.php'; 
-
   switch($_SESSION['userType']){
     case 'Sales Associate':
       $querytype="open";
@@ -76,21 +75,14 @@ include 'header.php';
 
   }
   ?>
-
   <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card mt-3">
                     <div class="card-header">    
                         <h4 class="mb-3"><?php echo "$headermsg"; ?></h4>
-                        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                        <button class="btn btn-secondary btn-sm m-1" id='idBtn' onclick="sortTable('number', 0, 'quoteTable')">Sort By ID</button>
-                        <button class="btn btn-secondary btn-sm m-1" id='custBtn' onclick="sortTable('string', 1, 'quoteTable')">Sort Alphabetically</button>
-                        <button class="btn btn-secondary btn-sm m-1" id='costBtn' onclick="sortTable('number', 2, 'quoteTable')">Sort By Order Total</button>
-                        <button class="btn btn-secondary btn-sm m-1" id='dateBtn' onclick="sortTable('string', 3, 'quoteTable')">Sort By Date Opened</button>
-                        <script src="tablesort.js"></script>
-                        </div>
                     </div>
+                  </div>
 
 <?php
 //echo "<h5>List of {$_GET['type']} quotes:</h5>";
@@ -103,10 +95,10 @@ if($statement->rowCount() > 0){
     echo "<table class='table table-striped' border='1' id='quoteTable'>
     <thead>
       <tr>
-        <th scope='col'>QuoteID</th>
-        <th scope='col'>Name</th>
-        <th scope='col'>Order Total</th>
-        <th scope='col'>Date Opened</th>
+        <th scope='col'><a href=\"javascript:sortTable('number', 0, 'quoteTable')\"> Quote ID </a> </th>
+        <th scope='col'><a href=\"javascript:sortTable('string', 1, 'quoteTable')\"> Name </a> </th>
+        <th scope='col'><a href=\"javascript:sortTable('number', 2, 'quoteTable')\"> Total </a> </th>
+        <th scope='col'><a href=\"javascript:sortTable('string', 3, 'quoteTable')\"> Open Date </a> </th>
         <th scope='col'></th>
       </tr>
     </thead>"
@@ -126,11 +118,10 @@ if($statement->rowCount() > 0){
 echo "<tbody>";    
 echo "</table>";
 echo "<b>$quoteCount quotes found</b>";
-
 ?>
-                </div>
             </div>
-         </div>
-   </div>
+        </div>
+      </div>
+   <script src="tablesort.js"></script>
   </body>
 </html>

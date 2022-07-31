@@ -1,17 +1,28 @@
 <?php
 session_start(['name' => 'quotes']);
+include 'header.php';
+include '../lib/db.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <title>My Commissions</title>
 <meta charset="utf-8">
-<link rel="stylesheet" href="../public/css/quote.css">
 </head>
 <body>
+
+
+
+<div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card mt-3">
+                    <div class="card-header">    
+                        <h4 class="mb-3">My commission info</h4>
+
+
 <?php
-include '../lib/db.php';
-include 'header.php';
+
     error_reporting(E_ALL);
     try {
      
@@ -19,7 +30,8 @@ include 'header.php';
         $result = $pdo->query("SELECT * FROM PurchaseOrders WHERE EmployeeID = {$_SESSION['userID']}");
         $orders = $result->fetchAll(PDO::FETCH_ASSOC);
 
-        echo "<table border='1'>";
+        echo "<table class='table table-striped' border='1'>";
+        echo "<thead>";
         echo "<tr>
             <th>Customer Name</th>
             <th>Order Total</th>
@@ -27,7 +39,9 @@ include 'header.php';
             <th>Commission</th>
             <th>Process Date</th>
             <th>Order Time</th>
-        <tr>";
+        <tr>
+        </thead>
+        <tbody>";    
         $commissionTotal = (float)0.00;
         foreach ($orders as $order) {
             $commission = (float)$order['OrderTotal'] * 0.01 * $order['CommissionRate'];
@@ -35,13 +49,14 @@ include 'header.php';
             $commission = number_format($commission,2);
             echo "<tr>
                 <td>{$order['CustomerName']}</td>
-                <td>{$order['OrderTotal']}</td>
+                <td>\${$order['OrderTotal']}</td>
                 <td>{$order['CommissionRate']}%</td>
                 <td>\${$commission}</td>
                 <td>{$order['ProcessDate']}</td>
                 <td>{$order['OrderTime']}</td>
                 </tr>";
         }
+        echo "</tbody>";    
         echo "</table>";
         echo "Total commissions: $" . number_format($commissionTotal,2);
     }
