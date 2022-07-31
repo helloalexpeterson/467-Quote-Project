@@ -1,3 +1,6 @@
+<?php
+session_start(['name' => 'quotes']);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +10,11 @@
 </head>
 <body>
 <?php
+include '../lib/db.php';
+include 'header.php';
     error_reporting(E_ALL);
     try {
-        session_start(['name' => 'quotes']); 
-        include '../lib/db.php';
-        include 'header.php';
+     
         $pdo = connectdb();
         $result = $pdo->query("SELECT * FROM PurchaseOrders WHERE EmployeeID = {$_SESSION['userID']}");
         $orders = $result->fetchAll(PDO::FETCH_ASSOC);
