@@ -1,53 +1,41 @@
 <?php  
 session_start(['name' => 'quotes']); 
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<?php 
+$pagetitle = "Administration";
 include 'header.php';
 include '../lib/func.php';
 include '../lib/db.php';
+$pdo = connectdb();
+$sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal, Street FROM Employees";
+$result = $pdo->query($sql);
+$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+
+
+
+
+
 ?>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Administration</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--- <link rel="stylesheet" href="admin.css"> --->
-</head>
-
-<body class="">
-    <?php 
-    $pdo = connectdb();
-    $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal, Street FROM Employees";
-    $result = $pdo->query($sql);
-    $rows = $result->fetchAll(PDO::FETCH_ASSOC);
-    ?>
+<!DOCTYPE html>
+<html>   
         <div class="container ">
-            <div class="container ">
-                <h2>Sales Associates</h2>
-              
-                <div class="individualAssoc">
-                <button id='idBtn' onclick="sortTable('number', 0, 'assocTable')">Sort By Employee ID</button>
-                <button id='fNameBtnn' onclick="sortTable('string', 1, 'assocTable')">Sort By First Name</button>
-                <button id='lnameBtn' onclick="sortTable('lname', 1, 'assocTable')">Sort By Last Name</button>
-                <button id='emailBtn' onclick="sortTable('string', 2, 'assocTable')">Sort By Email</button>
-                <button id='titleBtn' onclick="sortTable('string', 3, 'assocTable')">Sort By Address</button>
-                <button id='titleBtn' onclick="sortTable('string', 4, 'assocTable')">Sort By Title</button>
-                <button id='commissionBtn' onclick="sortTable('number', 5, 'assocTable')">Sort By Commission</button>
-                <br>                <br>
-
-                <table border='1' id='assocTable'>
-                    <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Address</th>
-                    <th>Title</th>
-                    <th>Commission total</th>
-                    </tr>
-                    
+            <div class="container row justify-content-center ">
+                <div class="col-md-10">
+                    <div class="card mt-3">
+                        <div class="card-header">    
+                            <h4 class="mb-3">Sales Associates</h4>
+                <table class='table table-striped' border='1' id='assocTable'>
+                <thead>
+                <tr>
+                <th scope='col'><a href="javascript:sortTable('number', 0, 'assocTable')"> ID </a> </th>
+                <th scope='col'><a href="javascript:sortTable('string', 1, 'assocTable')"> Username </a> </th>
+                <th scope='col'><a href="javascript:sortTable('string', 2, 'assocTable')"> Email </a> </th>
+                <th scope='col'><a href="javascript:sortTable('string', 3, 'assocTable')"> Address </a> </th>
+                <th scope='col'><a href="javascript:sortTable('string', 4, 'assocTable')"> Title </a> </th>
+                <th scope='col'><a href="javascript:sortTable('number', 5, 'assocTable')"> Commission total </a> </th>
+                <th scope='col'></th>
+                <th scope='col'></th>
+                </tr>
+                </thead>
+                <tbody>
                     <?php foreach($rows as $employee ){
                         //print a table of employees and buttons to edit and delete
                         echo "<tr>";
@@ -61,38 +49,51 @@ include '../lib/db.php';
                         echo "<td> {$employee['Title'] }</td>" ;
                         echo "<td> {$employee['CommissionTotal'] }</td>" ;
 
-                        echo "<td><button type='submit' name='editAssociate' value='editAssociate' id='editAssociate'>Edit</button></td>";
-                        echo "<td><button type='submit' name='deleteAssociate' id='deleteAssociate'>Delete</button></td>";
+                        echo "<td><button type='submit' class='btn btn-primary btn-sm' name='editAssociate' value='editAssociate' id='editAssociate'>Edit</button></td>";
+                        echo "<td><button type='submit' class='btn btn-primary btn-sm' name='deleteAssociate' id='deleteAssociate'>Delete</button></td>";
                         echo "</form>";
                         echo "</tr>";
                     } 
                     ?>
+                    </tbody>
                  </table>
                 </div>
-                
                 <script src="tablesort.js"></script>
             </div><br>
             <!--Print a form to add a new associate -->        
-            <div class="container ">
-                <h3>Add a new user:</h3>
-                <form method="POST" action="adminAddEmp.php">
-                    <label for="empName">Name:</label>
-                    <input type="text" id="empName" name="empName" placeholder="Associate name" required><br>
-                    <label for="pwd">Password:</label>
-                    <input type="password" id="pwd" name="pwd" placeholder="Associate password" required><br>
-                    <label for="email">E-mail:</label>
-                    <input type="email" id="email" name="email" placeholder="Associate E-mail" required><br>
-                    <label for="street">Address:</label>
-                    <input type="text" id="street" name="street" placeholder="Associate Address" required><br><br>
-                  
-                    <label for="title">Title:</label>
-                    <select id="title" name="title">
+
+            <div class="container row justify-content-center ">
+            <div class="col-md-10">
+            <h4 class="mb-3">Add a new user:</h4>
+            <form class="form-group" method="POST" action="adminAddEmp.php">
+            <div class="form-group">
+                <label for="empName">Name:</label>
+                <input type="text" class="form-control" id="empName" name="empName" placeholder="Associate name" required>
+            </div>
+            <div class="form-group">
+                <label for="pwd">Password:</label>
+                <input type="password" class="form-control" id="pwd" name="pwd" placeholder="Associate password" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Associate E-mail" required>
+            </div>
+            <div class="form-group">
+                <label for="street">Address:</label>
+                <input type="text" class="form-control"   id="street" name="street" placeholder="Associate Address" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="title">Title:</label>
+                <select id="title" name="title" class="form-control" placeholder="Title">
                         <option value="Sales Associate">Sales Associate</option>
                         <option value="Headquarters">Headquarters</option>
                         <option value="Administrator">Administrator</option>
-                    </select><br><br>
-                    <input type="submit" name="submit" value="Add new user">
-                </form>
+                </select>
+            </div>
+            </div>
+            <button class="btn btn-primary w-25  mb-5" type="submit" name="submit" value="Add new user" >Add new user</button>
+            </form>
+                <!----my code--->
             </div>
         </div>
     </div>

@@ -21,7 +21,7 @@ include '../lib/func.php';
                     VALUES ('$email', '$empName', '$street', '$title', '$hashed_pwd')";
 
         $pdo->exec($sql);
-
+        print_r($_POST);
         //reload admin.php
         header("Location: admin.php");
     }
