@@ -98,36 +98,40 @@ include '../lib/func.php';
         $row = $result->fetch(PDO::FETCH_ASSOC);
 
         echo <<<HTML
-        <form method="POST" action="adminAddEmp.php"> 
-                    <br>
-                    <h3>Update User:</h3>
+        <div class="container ">
+            <div class="container row justify-content-center ">
+                <div class="col">
+                    <div class="card mt-3">
+                        <div class="card-header">    
+                    <h4 class="mb-3">Update User</h4>
+        <form class="row" method="POST" action="adminAddEmp.php"> 
                     <label for="empName">Name:</label>
-                    <input type="text" id="empName" name="empName" placeholder="{$row['EmpName']}">
-                    <input type="submit" name="action" value="Update name"><br>
+                    <input class="col-sm-3 me-3" type="text" id="empName" name="empName" placeholder="{$row['EmpName']}">
+                    <input class="col-sm-3 me-3" type="submit" name="action" value="Update name"><br>
 
                     <label for="pwd">Password:</label>
-                    <input type="password" id="pwd" name="pwd" placeholder="">
-                    <input type="submit" name="action" value="Update password"><br>
+                    <input class="col-sm-3 me-3" type="password" id="pwd" name="pwd" placeholder="">
+                    <input class="col-sm-3 me-3" type="submit" name="action" value="Update password"><br>
 
                     <label for="email">E-mail:</label>
-                    <input type="email" id="email" name="email" placeholder="{$row['Email']}">
-                    <input type="submit" name="action" value="Update email"><br><br>
+                    <input class="col-sm-3 me-3 h-25" type="email" id="email" name="email" placeholder="{$row['Email']}">
+                    <input class="col-sm-3 me-3 h-25" type="submit" name="action" value="Update email"><br><br>
 
                     <label for="street">Address:</label>
-                    <input type="text" id="street" name="street" placeholder="{$row['Street']}">
-                    <input type="submit" name="action" value="Update mailing address"><br><br>
+                    <input class="col-sm-3 me-3 h-25 p-1" type="text" id="street" name="street" placeholder="{$row['Street']}">
+                    <input class="col-sm-3 me-3 h-25 p-1" type="submit" name="action" value="Update mailing address"><br><br>
 
                     <label for="title">Title:</label>
-                    <select id="title" name="title">
+                    <select class="col-sm-3 me-3" id="title" name="title">
                         <option value="Sales Associate">Sales Associate</option>
                         <option value="Headquarters">Headquarters</option>
                         <option value="Administrator">Administrator</option>
                     </select>
-                    <input type="submit" name="action" value="Update title"><br>
+                    <input class="col-sm-3 me-3" type="submit" name="action" value="Update title"><br>
 
                     <label for="commission">Commission:</label>
-                    <input type="number" id="commission" name="commission" placeholder="{$row['CommissionTotal']}" min="0" step='0.01'>
-                    <input type="submit" name="action" value="Update commission"><br><br>
+                    <input class="col-sm-3 me-3 h-25" type="number" id="commission" name="commission" placeholder="{$row['CommissionTotal']}" min="0" step='0.01'>
+                    <input class="col-sm-3 me-3 h-25" type="submit" name="action" value="Update commission"><br><br>
 
         HTML;
                     echo "<input type='hidden' name='editAssociate' value='{$editAssociate}'><br>";
