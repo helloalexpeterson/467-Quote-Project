@@ -189,7 +189,9 @@ function login($user, $pass){
             break;
 
         } 
-    } else {echo "<br> Username or Password invalid! <br>";}
+    } else { 
+        echo " <div class='alert alert-danger' role='alert'> Username or Password invalid!</div>";
+    }
 
 }
 
