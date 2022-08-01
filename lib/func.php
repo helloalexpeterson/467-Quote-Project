@@ -228,9 +228,10 @@ function advanceQuoteStatus($quoteID, $buttonText){
                 $prepared->execute();
             } 
             //try sending email
-            if(!sendCustomerEmail($pdo, $quoteID, $quote['Email'], 'quote')) {
+
+            /*if(!sendCustomerEmail($pdo, $quoteID, $quote['Email'], 'quote')) {
                 $msg += "Error: Email failed to send during sanctioning\n";
-            }
+            } */
             return $msg ="Quote $quoteID Sanctioned and ready for purchase order. A draft of this quote has been sent to {$quote['Email']}";
             break;
 
@@ -263,9 +264,9 @@ function advanceQuoteStatus($quoteID, $buttonText){
                 $msg = "Error with submitting purchase order to processor: $result";
             }
             // try sending email
-            if(!sendCustomerEmail($pdo, $quoteID, $quote['Email'], 'order')) {
+            /*if(!sendCustomerEmail($pdo, $quoteID, $quote['Email'], 'order')) {
                 $msg += "\nError: Email failed to send during order creation";
-            }
+            }*/
 
             return $msg; 
             break;

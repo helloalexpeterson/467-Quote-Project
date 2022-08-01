@@ -6,11 +6,17 @@ include '../lib/func.php';
 
 // form action for advancing quote status
 // show a success or an error message
-$msg = ''; 
+//$msg = ''; 
 if(isset($_POST['submitBtn']) && isset($_POST['submitBtn'])){
 
     $msg = advanceQuoteStatus($_GET['quoteID'], $_POST['submitBtn'] ); 
     unset($_POST['submitBtn']);
+
+    $pos=stripos($msg, "Error");
+    if($pos===0){
+        $errmsg = $msg;
+        unset($msg);   
+    }
 }    
 $pagetitle="View Quote";
 include 'header.php';
@@ -205,21 +211,28 @@ try {
         $disableDiscount = 'disabled';
         $buttonText = '';
     }   
- 
+    
+    //Print error if order fails
+    if(isset($errmsg)){
+        echo "<div class='alert alert-danger' role='alert'> $errmsg </div>";
+    }
+    //Print on order success
+    if(isset($msg)){
+        echo "<div class='alert alert-success' role='alert'> $msg </div>";
+    }
+    
     echo <<<HTML
-            <div class="container row justify-content-center ">
+            <div class="container-fluid row justify-content-center ">
                 <div class="col-md-10">
-                    <div class="card mt-3">
+                    <div class="card mt-3 mb-2">
                         <div class="card-header">    
                             <h2 class="mb-3">Quote $quoteID - Status: {$quote['OrderStatus']} </h2>
-                       
-        <div class='errorMsg'>$errorMsg</div>
+                         
         <!--- Print message confirming order -->  
-        <p>$msg</p>  
         <h2>$CustomerName</h2>
         <div class=\"address\">$city<br>$street<br>$contact<br> </div> </div>
     HTML;
-
+    
     // if has order, show info
     if (isset($order)) {
         echo "<div>";
@@ -243,9 +256,7 @@ try {
     echo "</form>";
     echo "</div>";    echo "</div>"; 
 
-
-    // Line Items
-    
+    // Line Items    
     echo "<h4 class='mb-3'>Line Items:</h4>";
     $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
     $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
