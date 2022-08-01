@@ -71,6 +71,13 @@
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
         <ul class="nav me-lg-auto">
+<?php if(!(isset($_SESSION['userType']))){
+
+  header("Location: login.php", 303);
+
+} ?>     
+
+
 <?php if($_SESSION['userType'] == 'Sales Associate' || $_SESSION['userType'] == 'Superuser'): ?>     
           <li class='px-2'><a href="quotes.php?type=open" class="nav-link text-white btn btn-primary ">Open Quotes</a></li>
           <li class='px-2'><a href="open.php" class="nav-link text-white btn btn-primary">Create New Quote</a></li>

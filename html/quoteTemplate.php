@@ -212,12 +212,12 @@ try {
                     <div class="card mt-3">
                         <div class="card-header">    
                             <h2 class="mb-3">Quote $quoteID - Status: {$quote['OrderStatus']} </h2>
-
+                       
         <div class='errorMsg'>$errorMsg</div>
         <!--- Print message confirming order -->  
         <p>$msg</p>  
         <h2>$CustomerName</h2>
-        <div class=\"address\">$city<br>$street<br>$contact<br></div>
+        <div class=\"address\">$city<br>$street<br>$contact<br> </div> </div>
     HTML;
 
     // if has order, show info
@@ -228,18 +228,25 @@ try {
         echo "<br>Commission: $" . number_format((0.01 * $order['CommissionRate'] * $order['OrderTotal']), 2);
         echo "</div>";
     }
+    echo "</div>";
 
     // Email
+    echo "<h4 class='mb-3'>Email:</h4>";
     echo "<form class=\"email\" action=\"\" method=\"POST\">";  
+    echo " <div class='row mb-3 '>"; 
+    echo " <div class='col'>"; 
         echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-        echo "Email: ";
-        echo "<input type=\"email\" name=\"Email\" value=\"$email\" required $disableEmail>";
-        echo "<button type=\"submit\" name=\"formAction\" value=\"email\" $disableEmail>Save email</button>";
+        echo "<input type=\"email\" id='email' class='form-control' name=\"Email\" value=\"$email\" required $disableEmail>";
+        echo "</div>";
+        echo " <div class='col'>"; 
+        echo "<button class='btn btn-secondary' type=\"submit\" name=\"formAction\" value=\"email\" $disableEmail>Save email</button>";
     echo "</form>";
+    echo "</div>";    echo "</div>"; 
+
 
     // Line Items
+    
     echo "<h4 class='mb-3'>Line Items:</h4>";
-
     $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
     $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
     $lineCount = 0;
@@ -247,35 +254,50 @@ try {
         $lineCount++;
         // jump to element after action
         if (isset($_POST['lineID']))
-            if ($lineCount == $_POST['lineID'])
-                echo "<div id='editedLine'>";
+            if ($lineCount == $_POST['lineID']) 
+                echo "<div id='editedLine'> </div>";
         echo "<form action='#editedLine' method='POST'>";
+        echo " <div class='row mb-1'>"; 
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-            echo "<input type=\"text\" name='editDesc' value=\"{$row["ServiceDesc"]}\" required $disableLines>";
-            echo "<input type=\"number\" name='editCost' value=\"{$row["Cost"]}\"] min='0' step='0.01' required $disableLines>";
+            echo " <div class='col'>"; 
+            echo "<input class='form-control' type=\"text\" name='editDesc' value=\"{$row["ServiceDesc"]}\" required $disableLines>"; 
+            echo "</div>";
+            echo " <div class='col'>"; 
+            echo "<input class='form-control' type=\"number\"  name='editCost' value=\"{$row["Cost"]}\"] min='0' step='0.01' required $disableLines>";
             echo "<input type=\"hidden\" name=\"lineID\" value=\"{$row['LineID']}\"/>";
-            echo "<button type=\"submit\" name='formAction' value='editLine' $disableLines>Edit</button>";
-            echo "<button type=\"submit\" name='formAction' value='deleteLine' $disableLines>Delete</button><br>";
+            echo "</div>";
+            echo " <div class='col'>"; 
+            echo "<button class='btn btn-secondary me-1' type=\"submit\" name='formAction' value='editLine' $disableLines>Edit</button>";
+            echo "<button class='btn btn-secondary' type=\"submit\" name='formAction' value='deleteLine' $disableLines>Delete</button><br>";
+            echo "</div>";
+            echo "</div>";
         echo "</form>";
-    }
+    } 
 
     if ($lineCount == 0) { echo "<div class='noItem'>No line items</div>"; }
 
     // add lines
     if (!$disableLines) {
-        echo "<form id='addedLine' action='#addedLine' method='POST'>";
+        echo "<form class='' id='addedLine' action='#addedLine' method='POST'>";
+        echo " <div class='row mb-3 '>"; 
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-            echo "<input type='text' name='addDesc' placeholder='Service Description' required $disableLines>";
-            echo "<input type='number' name='addCost' placeholder='Service Cost' min='0' step='0.01' required $disableLines>";
-            echo "<button type='submit'name='formAction' value='addLine' $disableLines>Add Line Item</button >";
+            echo " <div class='col'>"; 
+            echo "<input class='form-control' type='text' name='addDesc' placeholder='Service Description' required $disableLines>";
+            echo "</div>";
+            echo " <div class='col'>";
+            echo "<input class='form-control' type='number' name='addCost' placeholder='Service Cost' min='0' step='0.01' required $disableLines>";
+            echo "</div>";
+            echo " <div class='col'>";
+            echo "<button class='btn btn-secondary' type='submit'name='formAction' value='addLine' $disableLines>Add Line Item</button >";
+            echo "</div>";
         echo "</form >";
+        echo "</div>";
     }
-
+    
     // Secret Notes
     echo "<h4 class='mb-3'>Secret Notes:</h4>";
     $result = $pdo->query("SELECT * FROM Notes where QuoteID = $quoteID");
     $secretNotes = $result->fetchAll(PDO::FETCH_ASSOC);
-
     $count = 0;
     foreach ($secretNotes as $row) {
         $count++;
@@ -284,12 +306,18 @@ try {
             if ($count == $_POST['noteID'])
                 echo "<div id='editedNote'>";
         echo "<form action='#editedNote' method='POST'>";
+        echo " <div class='row mb-1'>"; 
+        echo " <div class='col'>"; 
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-            echo "<input type=\"text\" name='editNote' value=\"{$row['Note']}\" required $disableNotes>";
+            echo "<input class='form-control' type=\"text\" name='editNote' value=\"{$row['Note']}\" required $disableNotes>";
             echo "<input type=\"hidden\" name=\"noteID\" value=\"{$row['NoteID']}\"/>";
-            echo "<button type=\"submit\" name=\"formAction\" value=\"editNote\" $disableNotes>Edit</button>";
-            echo "<button type=\"submit\" name=\"formAction\" value=\"deleteNote\"$disableNotes>Delete</button><br>";
+            echo "</div>";
+            echo " <div class='col'>"; 
+            echo "<button class='btn btn-secondary me-1' type=\"submit\" name=\"formAction\" value=\"editNote\" $disableNotes>Edit</button>";
+            echo "<button class='btn btn-secondary' type=\"submit\" name=\"formAction\" value=\"deleteNote\"$disableNotes>Delete</button><br>";
+            echo "</div>";
          echo "</form>";
+         echo "</div>";
     }
 
     if ($count == 0) { echo "<div class='noItem'>No secret notes</div>"; }
@@ -297,9 +325,14 @@ try {
     // add secret notes
     if (!$disableNotes) {
         echo "<form id='addedNote' action='#addedNote' method='POST'>";
+        echo " <div class='row mb-1'>"; 
             echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-            echo "<input type='text' name='addNote' placeholder='Note' required $disableNotes>";
-            echo "<button type='submit' name='formAction' value='addNote' $disableNotes>Add Secret Note</button>";
+            echo " <div class='col'>"; 
+            echo "<input class='form-control' type='text' name='addNote' placeholder='Note' required $disableNotes>";
+            echo "</div>";
+            echo " <div class='col'>";
+            echo "<button class='btn btn-secondary' type='submit' name='formAction' value='addNote' $disableNotes>Add Secret Note</button>";
+            echo "</div>";
         echo "</form>";
     }
 
@@ -311,25 +344,39 @@ try {
         $lineTotal= $lineTotal + ($line['Cost']); 
     }
 
+       // show current discounted amount
+       $discountTotal = $lineTotal - $orderTotal;
+       $discountTotal = round($discountTotal, $precision = 2);
+       echo "<h4 class='mt-3 mb-2'>Current discount: &dollar;{$discountTotal}</h4>";
+
     echo "<form id='discounted' class='discountPercent' action='#discounted' method='POST'>";
+    echo " <div class='row mb-1'>"; 
         echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-        echo "<label>Discount %: </label>";
-        echo "<input type='number' name='discount' placeholder='' min='0' max='100' required $disableDiscount >";
-        echo "<button type='submit' name='formAction' value='discountPercent' required $disableDiscount >Apply</button><br>";
+        echo " <div class='col'>";
+        echo "<input class='form-control' type='number' name='discount' placeholder='Discount %:' min='0' max='100' required $disableDiscount >";
+        echo " </div>";
+        echo " <div class='col'>";
+        echo "<button class='btn btn-secondary' type='submit' name='formAction' value='discountPercent' required $disableDiscount >Apply</button><br>";
+        echo " </div>";
+        echo " </div>";
     echo "</form>";
     echo "<form class='discountAmount' action='#discounted' method='POST'>";
+    echo " <div class='row'>"; 
+        echo " <div class='col'>";
         echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
-        echo "<label>Discount Amount: </label>";
-        echo "<input type='number' name='discount' placeholder='' min='0' max='{$lineTotal}' step='0.01' required  $disableDiscount >";
-        echo "<button type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
-
-        // show current discounted amount
-        $discountTotal = $lineTotal - $orderTotal;
-        $discountTotal = round($discountTotal, $precision = 2);
-        echo "<label>Current discount: &dollar;{$discountTotal}</label><br>";
-        $orderTotal = round($orderTotal, $precision = 2);
-        echo "<label>Amount: &dollar;{$orderTotal}</label>";
+        echo "<input class='form-control' type='number' name='discount' placeholder='Discount Sum:' min='0' max='{$lineTotal}' step='0.01' required  $disableDiscount >";
+        echo "</div>";
+        echo "<div class='col'>";
+        echo "<button class='btn btn-secondary' type='submit' name='formAction' value='discountAmount' $disableDiscount >Apply</button><br>";
+        echo "</div>";
+        echo " </div>";
     echo "</form>";
+    echo "<small class='text-muted'>To remove discount, enter zero and click apply.</small>";
+
+
+    //Display order total minus discount
+    $orderTotal = round($orderTotal, $precision = 2);
+    echo "<h4 class='mt-3 mb-2'>Subtotal: &dollar;{$orderTotal}</h4>";
 
     //Finalize quote/Sanction Quote/Order quote button
     if($quote['OrderStatus'] !== 'ordered'){ 
@@ -343,23 +390,27 @@ try {
             $quoteID = isset($_GET['quoteID']) ? $_GET['quoteID']: $quoteID;
             $email = isset($_POST['Email']) ? $_POST['Email'] : $quote['Email'];
             echo "<input type=hidden name='quoteID' value={$quoteID}>";
+            echo "<div class='row'>";
             if(($_SESSION['userType'] == "Superuser" || $_SESSION['userType']=='Sales Associate') && $quote['OrderStatus'] == "open"){
-                echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
-                echo "<button type=submit name=submitBtn value='Finalize Quote' id=submitBtn $disableSubmit>Finalize Quote</button>";
+               // echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>"; echo "&nbsp";
+                echo "<p class='mt-3 mb-2'>{$buttonMsg}</p>";
+                echo "<button button class='btn  btn-success' type=submit name=submitBtn value='Finalize Quote' id=submitBtn $disableSubmit>Finalize Quote</button>";
             }
             if(($_SESSION['userType'] == "Superuser" || $_SESSION['userType']=='Headquarters') && $quote['OrderStatus'] == "finalized"){
-                echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
-                echo "<button type=submit name=submitBtn value='Sanction Quote' id=submitBtn $disableSubmit>Sanction Quote</button>";
+                //echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>"; echo "&nbsp";
+                echo "<p class='mt-3 mb-2'>{$buttonMsg}</p>";
+
+                echo "<button button class='btn  btn-success' type=submit name=submitBtn value='Sanction Quote' id=submitBtn $disableSubmit>Sanction Quote</button>";
             }
             if(($_SESSION['userType'] == "Superuser" ||$_SESSION['userType']=='Headquarters') && $quote['OrderStatus'] == "sanctioned"){
-                echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>";
-                echo "<button type=submit name=submitBtn value='Order Quote' id=submitBtn $disableSubmit>Order Quote</button>";
-            }
-            
-        echo "</form>";
-    }
-   
+                //echo "<label for=submitBtn><p>{$buttonMsg}</p> </label>"; echo "&nbsp";
+                echo "<p class='mt-3 mb-2'>{$buttonMsg}</p>";
 
+                echo "<button button class='btn  btn-success' type=submit name=submitBtn value='Order Quote' id=submitBtn $disableSubmit>Order Quote</button>";
+            }
+        echo "</form>";
+        echo "</div>";
+    }
 }
 catch(PDOexception $e) {
     echo "Connection failed: " . $e->getMessage();
