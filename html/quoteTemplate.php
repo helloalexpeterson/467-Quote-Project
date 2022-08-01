@@ -207,8 +207,13 @@ try {
     }   
  
     echo <<<HTML
+            <div class="container row justify-content-center ">
+                <div class="col-md-10">
+                    <div class="card mt-3">
+                        <div class="card-header">    
+                            <h2 class="mb-3">Quote $quoteID - Status: {$quote['OrderStatus']} </h2>
+
         <div class='errorMsg'>$errorMsg</div>
-        <h2>Quote $quoteID -  status: {$quote['OrderStatus']} </h2>
         <!--- Print message confirming order -->  
         <p>$msg</p>  
         <h2>$CustomerName</h2>
@@ -225,7 +230,7 @@ try {
     }
 
     // Email
-    echo "<form class=\"email\" action=\"\" method=\"POST\">";
+    echo "<form class=\"email\" action=\"\" method=\"POST\">";  
         echo "<input type=\"hidden\" name=\"quoteID\" value=\"$quoteID\">";
         echo "Email: ";
         echo "<input type=\"email\" name=\"Email\" value=\"$email\" required $disableEmail>";
@@ -233,8 +238,8 @@ try {
     echo "</form>";
 
     // Line Items
-    echo "<h1>Line Items:</h1>";
-    
+    echo "<h4 class='mb-3'>Line Items:</h4>";
+
     $result = $pdo->query("SELECT * FROM LineItems where QuoteID = $quoteID");
     $lineItems = $result->fetchAll(PDO::FETCH_ASSOC);
     $lineCount = 0;
@@ -267,8 +272,7 @@ try {
     }
 
     // Secret Notes
-    echo "<h1>Secret Notes:</h1>";
-
+    echo "<h4 class='mb-3'>Secret Notes:</h4>";
     $result = $pdo->query("SELECT * FROM Notes where QuoteID = $quoteID");
     $secretNotes = $result->fetchAll(PDO::FETCH_ASSOC);
 

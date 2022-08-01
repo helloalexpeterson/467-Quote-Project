@@ -112,10 +112,10 @@ if($statement->rowCount() > 0){
         echo "<td> {$row['CustomerName'] } </td>" ; 
         echo "<td> {$row['OrderTotal'] } </td>" ; 
         echo "<td> {$row['StartDate'] } </td>";
-        echo "<td><a href=\"quoteTemplate.php?quoteID={$row['QuoteID']}\" class='btn btn-primary'> $buttonText</a></td> ";
+        echo "<td><a href=\"quoteTemplate.php?quoteID={$row['QuoteID']}\" class='btn btn-primary btn-sm'> $buttonText</a></td> ";
       echo "</tr>";
 }
-echo "<tbody>";    
+echo "</tbody>";    
 echo "</table>";
 echo "<b>$quoteCount quotes found</b>";
 ?>
