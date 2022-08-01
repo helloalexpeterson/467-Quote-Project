@@ -8,11 +8,6 @@ $pdo = connectdb();
 $sql = "SELECT EmployeeID, Email, EmpName, Title, CommissionTotal, Street FROM Employees";
 $result = $pdo->query($sql);
 $rows = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-
-
 ?>
 <!DOCTYPE html>
 <html>   
@@ -62,7 +57,7 @@ $rows = $result->fetchAll(PDO::FETCH_ASSOC);
             </div><br>
             <!--Print a form to add a new associate -->        
 
-            <div class="container row justify-content-center ">
+            <div class="container row justify-content-center">
             <div class="col-md-10">
             <h4 class="mb-3">Add a new user:</h4>
             <form class="form-group" method="POST" action="adminAddEmp.php">
