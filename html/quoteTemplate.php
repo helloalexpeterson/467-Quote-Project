@@ -229,10 +229,9 @@ try {
                             <h2 class="mb-3">Quote $quoteID - Status: {$quote['OrderStatus']} </h2>
                          
         <!--- Print message confirming order -->  
-        <h2>$CustomerName</h2>
-        <div class=\"address\">$city<br>$street<br>$contact<br> </div> </div>
     HTML;
-    
+    echo "<h2>$CustomerName</h2>";
+    echo "<div class=\"address\">$city<br>$street<br>$contact<br>";
     // if has order, show info
     if (isset($order)) {
         echo "<div>";
@@ -242,6 +241,7 @@ try {
         echo "</div>";
     }
     echo "</div>";
+    echo "</div> </div>";
 
     // Email
     echo "<h4 class='mb-3'>Email:</h4>";
