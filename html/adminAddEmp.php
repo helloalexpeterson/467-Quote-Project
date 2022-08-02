@@ -1,5 +1,6 @@
 <?php  
 session_start(['name' => 'quotes']); 
+//This page displays forms to create a new user
 include 'header.php';
 include '../lib/db.php';
 include '../lib/func.php';

@@ -1,5 +1,6 @@
 <?php  
 session_start(['name' => 'quotes']); 
+//This page has the employee management and create employee features
 $pagetitle = "Administration";
 include 'header.php';
 include '../lib/func.php';
@@ -88,7 +89,6 @@ $rows = $result->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <button class="btn btn-primary w-25  mb-5" type="submit" name="submit" value="Add new user" >Add new user</button>
             </form>
-                <!----my code--->
             </div>
         </div>
     </div>

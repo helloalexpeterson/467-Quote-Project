@@ -1,4 +1,5 @@
 <?php  
+//This page shows all quotes for the admin to view
 $pagetitle = "Administration";
 session_start(['name' => 'quotes']); 
 include 'header.php'; 

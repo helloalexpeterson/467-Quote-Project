@@ -3,7 +3,7 @@ session_start(['name' => 'quotes']);
 
 include '../lib/db.php';
 include '../lib/func.php';
-
+//This template is used to display single quote information for editing or viewing
 // form action for advancing quote status
 // show a success or an error message
 //$msg = ''; 

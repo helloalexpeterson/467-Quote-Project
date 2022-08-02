@@ -1,5 +1,13 @@
 <?php
 include '../config/secrets.php';
+
+// createQuote
+// args: 
+// $pdo - pdo object, connection to our db
+// $id, $city, $street, $name, $contact, $email - variables from submitted from POST in open.php 
+//
+// inserts a new quote into Quotes table
+// returns the quote id of the new quote
 function createQuote($pdo, $id, $name, $city, $street, $contact, $email)
 {   
     //setting empid and status to be default while I figure out how to use employeeID with session variables
@@ -32,6 +40,10 @@ function createQuote($pdo, $id, $name, $city, $street, $contact, $email)
 
 }
 
+// updateName
+// args: $pdo - db connection object
+//       $empID - id of user from Employee table
+//       $val - text of name to update in Employee table 
 function updateName($pdo, $empID, $val){
     $sql ='UPDATE Employees SET EmpName = :val WHERE EmployeeID = :empID ;';   
     try {
@@ -50,6 +62,10 @@ function updateName($pdo, $empID, $val){
     }
 }
 
+// updateEmail
+// args: $pdo - db connection object
+//       $empID - id of user from Employee table
+//       $val - text of email to update in Employee table 
 function updateEmail($pdo, $empID, $val){
     $sql ='UPDATE Employees SET Email = :val WHERE EmployeeID = :empID ;';   
     try {
@@ -68,6 +84,10 @@ function updateEmail($pdo, $empID, $val){
     }
 }
 
+// updateTitle
+// args: $pdo - db connection object
+//       $empID - id of user from Employee table
+//       $val - text of title to update in Employee table 
 function updateTitle($pdo, $empID, $val){
     $sql ='UPDATE Employees SET Title = :val WHERE EmployeeID = :empID ;';   
     try {
@@ -86,6 +106,10 @@ function updateTitle($pdo, $empID, $val){
     }
 }
 
+// updatePassword
+// args: $pdo - db connection object
+//       $empID - id of user from Employee table
+//       $pass - plaintext of password to hash and update in Employee table 
 function updatePassword($pdo, $empID, $pass){
     $sql ='UPDATE Employees SET PwHash = :hash WHERE EmployeeID = :empID ;';   
     $hash = password_hash($pass, PASSWORD_DEFAULT);
@@ -105,6 +129,12 @@ function updatePassword($pdo, $empID, $pass){
     }
 }
 
+// updateCommission
+// args: $pdo - db connection object
+//       $empID - id of user from Employee table
+//       $commission - value of commission $ to override exisiting value in Employee table
+//       The commission on myCommissions.php will show the sum total of purchase orders,
+//       as well as show the difference between the sum and the admin adjustment value  
 function updateCommission($pdo, $empID, $commission){
     $sql ='UPDATE Employees SET CommissionTotal = :comm WHERE EmployeeID = :empID ;';   
     try {
@@ -122,7 +152,10 @@ function updateCommission($pdo, $empID, $commission){
     }
 }
 
-
+// updateAddress
+// args: $pdo - db connection object
+//       $empID - id of user from Employee table
+//       $street - text of address to update in Employee table 
 function updateAddress($pdo, $empID, $street){
     $sql ='UPDATE Employees SET Street = :street WHERE EmployeeID = :empID ;';   
     try {
@@ -141,6 +174,9 @@ function updateAddress($pdo, $empID, $street){
 
 }
 
+// login
+// args: $user - a userID from Employees table, $pass - plaintext password
+// if the username and password verify true - set the SESSION to the user's info
 function login($user, $pass){
     global $debug;
     $pdo = connectdb();

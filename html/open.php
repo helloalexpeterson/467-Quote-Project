@@ -1,5 +1,6 @@
 <?php    
 session_start(['name' => 'quotes']); 
+//This page is for an associate to create a new quote
 //Make sure user has permissions
 if(!(isset($_SESSION['userType']) && $_SESSION['userType'] =='Sales Associate')){
     header("Location: login.php", 303);

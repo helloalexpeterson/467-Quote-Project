@@ -1,5 +1,6 @@
 <?php
 session_start(['name' => 'quotes']);
+//This page displays the commissions for a given employee
 include 'header.php';
 include '../lib/db.php';
 ?>
@@ -11,16 +12,12 @@ include '../lib/db.php';
 </head>
 <body>
 
-
-
 <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10">
                 <div class="card mt-3">
                     <div class="card-header">    
                         <h4 class="mb-3">My commission info</h4>
-
-
 <?php
 
     error_reporting(E_ALL);

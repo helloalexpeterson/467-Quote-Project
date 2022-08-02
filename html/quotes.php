@@ -3,6 +3,7 @@ session_start(['name' => 'quotes']);
 if(!(isset($_SESSION['userType']))){
   header("Location: login.php", 303);
 }
+//This page displays the quotes to the user based on either the user type or the quote status
 ?>
 <!DOCTYPE html>
 <html>
