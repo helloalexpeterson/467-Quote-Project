@@ -16,7 +16,7 @@ $rows = $result->fetchAll(PDO::FETCH_ASSOC);
                 <div class="col-md-10">
                     <div class="card mt-3">
                         <div class="card-header">    
-                            <h4 class="mb-3">Sales Associates</h4>
+                            <h4 class="mb-3">Users</h4>
                 <table class='table table-striped' border='1' id='assocTable'>
                 <thead>
                 <tr>
