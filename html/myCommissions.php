@@ -27,6 +27,9 @@ include '../lib/db.php';
     try {
      
         $pdo = connectdb();
+        $result = $pdo->query("SELECT * FROM Employees WHERE EmployeeID = {$_SESSION['userID']}");
+        $currEmp = $result->fetch(PDO::FETCH_ASSOC);
+
         $result = $pdo->query("SELECT * FROM PurchaseOrders WHERE EmployeeID = {$_SESSION['userID']}");
         $orders = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -58,6 +61,12 @@ include '../lib/db.php';
         }
         echo "</tbody>";    
         echo "</table>";
+        if ($commissionTotal == $currEmp['CommissionTotal']) { }
+        else {
+            $adminAdjustment = $currEmp['CommissionTotal'] - $commissionTotal;
+            echo "Admin Adjustment: $" . number_format($adminAdjustment,2) . "<br>";
+            $commissionTotal = $currEmp['CommissionTotal'];
+        }
         echo "Total commissions: $" . number_format($commissionTotal,2);
     }
     catch(PDOexception $e) {
