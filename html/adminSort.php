@@ -25,7 +25,8 @@ $today = $year . '-' . $month . '-' . $day;
 
 $db = connectdb();
 if(isset($_GET['submitdate'])){
-  $dbsql = "SELECT * FROM Quotes WHERE StartDate BETWEEN ? AND ? ORDER BY StartDate;";
+  $dbsql = "SELECT Quotes.QuoteID, Quotes.CustomerName, Quotes.StartDate, Quotes.OrderTotal, Quotes.OrderStatus, Employees.EmpName 
+  FROM Quotes JOIN Employees ON Quotes.EmployeeID = Employees.EmployeeID  WHERE StartDate BETWEEN ? AND ? ORDER BY StartDate;";
   $statement = $db->prepare($dbsql);
   $dbresult = $statement->execute([$_GET['start'],$_GET['end']]);            
   $dbrow = $statement->fetchAll(PDO::FETCH_ASSOC);
