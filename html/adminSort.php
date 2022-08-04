@@ -144,21 +144,20 @@ echo "</div>";
 
 //Display quotes
 if($statement->rowCount() > 0){
-    echo "<table class='table table-striped' border='1'>
+    echo "<table class='table table-striped' border='1' id='adqTable'>
     <thead>
     <tr>
-    <th>QuoteID</th>
-    <th>Date</th>
-    <th>Name</th>
-    <th>Order Total</th>
-    <th>Order Status</th>
-    <th>Employee</th>
-    <th></th>
+    <th scope='col'><a href=\"javascript:sortTable('number', 0, 'adqTable')\"> QuoteID </a></th>
+    <th scope='col'><a href=\"javascript:sortTable('string', 1, 'adqTable')\"> Date </a></th>
+    <th scope='col'><a href=\"javascript:sortTable('string', 2, 'adqTable')\"> Customer Name </a></th>
+    <th scope='col'><a href=\"javascript:sortTable('number', 3, 'adqTable')\"> Order Total </a></th>
+    <th scope='col'><a href=\"javascript:sortTable('string', 4, 'adqTable')\"> Order Status </a></th>
+    <th scope='col'><a href=\"javascript:sortTable('string', 5, 'adqTable')\"> Employee </a></th>
     </tr>
     </thead>
     </tbody>";
   }
-
+ 
     $quoteCount = 0;
     foreach($dbrow as $row){
         $quoteCount++;
@@ -176,5 +175,6 @@ echo "</tbody>";
 echo "</table>";
 echo "<b>$quoteCount quotes found</b>";
 ?>
+    <script src="tablesort.js"></script>
   </body>
 </html>
